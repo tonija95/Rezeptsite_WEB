@@ -1,0 +1,1 @@
+<!-- Favoriten – Liste der Favoriten (Platzhalter) -->
