@@ -1,0 +1,1 @@
+<!-- Admin Panel – Links zu Admin-Ansichten, kurze Infos -->

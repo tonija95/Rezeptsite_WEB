@@ -1,0 +1,1 @@
+<!-- Name, Bewertung, Kategorien, Bild, Zeit, Zutaten, Anleitung (+ später Buttons) -->

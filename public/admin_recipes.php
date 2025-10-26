@@ -1,0 +1,1 @@
+<!--  Admin Ansicht-Rezepte – Tabelle (Titel/User/Status) + (später) Sperren/Löschen-->

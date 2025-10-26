@@ -1,0 +1,1 @@
+<!-- Dashboard – User Infos, Button „Neues Rezept erstellen“, Link Einkaufsliste, Logout-Hinweis -->
