@@ -1,0 +1,21 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Local configuration
+.env
+config/config.php
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# ignore everything in uploads folder
+/uploads/*
+# except README.md
+!/uploads/README.md
+
+
+# IDE & editor settings
+/.vscode/
+.idea/
