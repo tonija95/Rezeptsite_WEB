@@ -1,0 +1,245 @@
+:root {
+  /* ===== Farbpalette: Modern Neutral / Stone Vibe ===== */
+  --color-primary:   #6B6256;   /* dunkles Greige-Braun */
+  --color-secondary: #7C8573;   /* graugrünlich-oliv */
+  --color-dark:      #2F2F2C;   /* anthrazit-grau */
+  --color-light:     #E2DED7;   /* warmes Steinbeige */
+  --color-bg:        #F5F4F1;   /* helles Greige */
+  --color-text:      #3A3936;   /* neutral-dunkelgrau */
+  --color-accent:    #9DA69D;   /* sanftes Graugrün */
+  --color-brand-accent:       #D8D6D0;
+  --color-brand-accent-hover: #C2BEB7;
+
+  /* Bootstrap Aliases */
+  --bs-primary:    var(--color-primary);
+  --bs-secondary:  var(--color-secondary);
+  --bs-dark:       var(--color-dark);
+  --bs-light:      var(--color-light);
+  --bs-body-bg:    var(--color-bg);
+  --bs-body-color: var(--color-text);
+}
+
+
+
+/* =========================================================
+   Grundlayout
+   ========================================================= */
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/*    Typografie & Basislinks */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600 !important;
+  color: var(--color-dark);
+  letter-spacing: 0.5px;
+}
+
+a {
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--bs-secondary);
+  text-decoration: underline;
+}
+
+
+main {
+  flex: 1; /* Footer immer unten */
+  margin: 0;
+  background: var(--bs-body-bg);
+}
+
+.section, .card, .panel {
+  background: #fff;
+  border: 1px solid var(--color-light);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+/* Standard Padding für Sektionen */
+.section {
+  padding: .75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* badges für Rezeptkeywords */
+.badge{
+  background:var(--color-accent);
+  color:var(--color-dark);
+}
+
+/* =========================================================
+   Hero / Sektionen
+   ========================================================= */
+.hero{
+  background:linear-gradient(180deg,#F4EFEA 0%,#EDE4DD 100%);
+  border:1px solid #E0D6CD;
+  border-radius:14px;
+}
+.bg-cream{background:var(--bs-light);}
+
+/* =========================================================
+   Cards
+   ========================================================= */
+
+
+.card .card-img-top{aspect-ratio:16/10;object-fit:cover;}
+.card .card-title{color:var(--bs-dark);font-weight:600;}
+.card .card-text{color:var(--bs-body-color);}
+.card .badge{
+  background:var(--color-accent);
+  color:var(--color-dark);
+}
+
+
+/* =========================================================
+   Navbar
+   ========================================================= */
+
+.site-navbar{
+    padding: .75rem 0;
+    background-color: var(--bs-primary);
+
+}
+
+
+/* Logo */
+.site-navbar .navbar-brand {
+  font-weight: 600;
+  color: var(--color-brand-accent);
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-size: 1.6rem;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+}
+
+.site-navbar .navbar-brand:hover {
+  color: var(--color-brand-accent-hover);
+  text-decoration: none;
+}
+
+/* Links + Dropdown */
+.site-navbar .nav-link , .site-navbar .dropdown-item{
+  color: var(--bs-body-bg);
+   
+}
+
+.site-navbar .nav-link:hover, .site-navbar .dropdown-item:hover{
+    background:rgba(255,255,255,.10);
+    border-radius: .25rem;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.site-navbar .dropdown-menu{
+  padding: .75rem 0;
+  --bs-dropdown-bg: var(--bs-primary);              
+  background-color: var(--bs-dropdown-bg);
+}
+
+
+/* Login/Logout btn */
+
+.site-navbar .btn-login {
+  background-color: var(--color-light);
+  color: var(--color-dark);
+  border: 1px solid var(--color-light);
+}
+
+.site-navbar .btn-login:hover {
+  background-color: var(--color-accent);
+}
+
+.site-navbar .btn .btn-logout {
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  border: 1px solid var(--color-dark);
+}
+
+.site-navbar .btn-logout:hover {
+  background-color: var(--color-secondary);
+}
+
+/*Login-Dropdown (hellere Variante) */
+.site-navbar .dropdown-login .dropdown-menu{
+  --bs-dropdown-bg: var(--color-light);
+  --bs-dropdown-link-color: var(--color-dark);
+  --bs-dropdown-link-hover-bg: var(--color-accent);
+  --bs-dropdown-link-hover-color: var(--color-dark);
+  --bs-dropdown-border-color: var(--color-accent);
+}
+
+
+.site-navbar .dropdown-login .form-control{
+  background: #fff;
+  color: var(--color-dark);
+}
+.site-navbar .dropdown-login .dropdown-item {
+  color: var(--color-dark);
+  opacity: 0.9;
+}
+
+.site-navbar .dropdown-login .dropdown-item:hover {
+  background: transparent;
+  color: var(--color-secondary);
+  opacity: 1;
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.footer{
+  color: var(--bs-body-bg);
+  background-color: var(--bs-primary);
+
+}
+.footer a{color:var(--bs-body-bg);text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.btn-primary{
+  background:var(--bs-primary);
+  border-color:var(--bs-primary);
+  color:#fff !important;
+}
+.btn-primary:hover{
+  background:var(--bs-secondary);
+  border-color:var(--bs-secondary);
+}
+.btn-outline-secondary{
+  color:var(--bs-primary);
+  border-color:var(--bs-primary);
+}
+.btn-outline-secondary:hover{
+  background:var(--bs-primary);
+  color:#fff;
+  text-decoration:none;
+}
