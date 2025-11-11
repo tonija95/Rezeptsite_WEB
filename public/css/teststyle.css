@@ -1,0 +1,171 @@
+/* =========================================================
+   Rezeptsite Theme – Warm Greige · Mobile-first
+   JS-frei · Bootstrap-kompatibel · Nur Light-Theme
+   ========================================================= */
+:root{
+  /* ===== Farbpalette (warm, leicht beige-grau) ===== */
+  --color-primary:   #6A5747;  /* Navbar, Buttons */
+  --color-secondary: #8B7A6C;  /* Hover/Akzent */
+  --color-dark:      #2C2723;  /* Headlines / starker Text */
+  --color-light:     #E6DED7;  /* helle Sektionen */
+  --color-bg:        #F4EFEA;  /* Seitenhintergrund */
+  --color-text:      #3A322C;  /* Fließtext */
+  --color-accent:    #CBBBAE;  /* Badges, kleine Akzente */
+
+  /* Bootstrap Aliases */
+  --bs-primary:      var(--color-primary);
+  --bs-secondary:    var(--color-secondary);
+  --bs-dark:         var(--color-dark);
+  --bs-light:        var(--color-light);
+  --bs-body-bg:      var(--color-bg);
+  --bs-body-color:   var(--color-text);
+}
+
+/* =========================================================
+   Grundlayout
+   ========================================================= */
+html,body{height:100%;}
+body{
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+/* .container-narrow{max-width:960px;} */
+a{color:var(--bs-primary);text-decoration:none;}
+a:hover{color:var(--bs-secondary);text-decoration:underline;}
+
+.section,.card,.panel{
+  background:#fff;
+  border:1px solid var(--color-light);
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+.section{padding:1rem;}
+@media (min-width:768px){.section{padding:1.5rem;}}
+
+/* =========================================================
+   NAVBAR (CSS-only Toggle via Checkbox, kein JS)
+   ========================================================= */
+.navx{
+  background:var(--bs-primary);
+  border-bottom:none;
+}
+.navx__toggle{position:absolute;left:-9999px;}
+.navx__bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1rem;
+}
+.navx__brand{color:#fff;text-decoration:none;font-weight:600;}
+.navx__btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:42px;height:42px;border:1px solid rgba(255,255,255,.35);
+  border-radius:.5rem;cursor:pointer;user-select:none;
+}
+.navx__icon{position:relative;width:18px;height:2px;background:#fff;}
+.navx__icon::before,.navx__icon::after{
+  content:"";position:absolute;left:0;width:18px;height:2px;background:#fff;
+}
+.navx__icon::before{top:-6px;} .navx__icon::after{top:6px;}
+
+.navx__menu{
+  display:none;list-style:none;margin:0;padding:.5rem 1rem 1rem;
+  flex-direction:column;gap:.25rem;
+}
+.navx__menu li a{
+  display:block;padding:.5rem .75rem;border-radius:.375rem;
+  color:#fff !important;text-decoration:none;
+}
+.navx__menu li a:hover{background:rgba(255,255,255,.10);}
+
+.navx__toggle:checked ~ .navx__menu{display:flex;}
+.navx__toggle:checked + .navx__bar .navx__btn .navx__icon{background:transparent;}
+.navx__toggle:checked + .navx__bar .navx__btn .navx__icon::before{
+  top:0;transform:rotate(45deg);
+}
+.navx__toggle:checked + .navx__bar .navx__btn .navx__icon::after{
+  top:0;transform:rotate(-45deg);
+}
+
+@media (min-width:768px){
+  .navx__btn{display:none;}
+  .navx__menu{
+    display:flex !important;flex-direction:row;align-items:center;
+    gap:.25rem;padding:.25rem 1rem 1rem;
+  }
+  .navx__menu li a{padding:.375rem .75rem;}
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.btn-primary{
+  background:var(--bs-primary);
+  border-color:var(--bs-primary);
+  color:#fff !important;
+}
+.btn-primary:hover{
+  background:var(--bs-secondary);
+  border-color:var(--bs-secondary);
+}
+.btn-outline-secondary{
+  color:var(--bs-primary);
+  border-color:var(--bs-primary);
+}
+.btn-outline-secondary:hover{
+  background:var(--bs-primary);
+  color:#fff;
+}
+
+/* =========================================================
+   Formulare
+   ========================================================= */
+.form-control,.form-select{
+  border-radius:10px;
+  border:1px solid #D2C8BE;
+  background:#fff;
+  color:var(--bs-body-color);
+}
+.form-control::placeholder{color:#A38F7F;}
+.form-control:focus,.form-select:focus{
+  border-color:#BCAFA3;
+  box-shadow:0 0 0 .2rem rgba(106,87,71,.15);
+}
+
+/* =========================================================
+   Rezeptkarten
+   ========================================================= */
+.recipe-card.card{overflow:hidden;}
+.recipe-card .card-img-top{aspect-ratio:16/10;object-fit:cover;}
+.recipe-card .card-title{color:var(--bs-dark);font-weight:600;}
+.recipe-card .card-text{color:var(--bs-body-color);}
+.recipe-card .badge{
+  background:var(--color-accent);
+  color:var(--color-dark);
+}
+
+/* =========================================================
+   Hero / Sektionen
+   ========================================================= */
+.hero{
+  background:linear-gradient(180deg,#F4EFEA 0%,#EDE4DD 100%);
+  border:1px solid #E0D6CD;
+  border-radius:14px;
+}
+.bg-cream{background:var(--bs-light);}
+
+/* =========================================================
+   Footer + Back-to-top
+   ========================================================= */
+.footer{
+  color:rgba(255,255,255,.9);
+  background:var(--bs-primary);
+}
+.footer a{color:#fff;text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+.back-to-top{
+  position:fixed;bottom:20px;right:20px;width:42px;height:42px;
+  border-radius:50%;display:grid;place-items:center;
+  background:#fff;color:var(--bs-primary);
+  border:1px solid #D1D5DB;font-weight:700;text-decoration:none;
+}
+.back-to-top:hover{background:#F3F4F6;}
