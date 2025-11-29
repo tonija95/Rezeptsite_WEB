@@ -11,7 +11,6 @@ $recipe = [
   'description'  => $isEdit ? 'Kurzbeschreibung …' : '',
   'time_minutes' => $isEdit ? 15 : '',
   'servings'     => $isEdit ? 2  : '',
-  'visibility'   => $isEdit ? 'public' : 'private',
   'image_url'    => $isEdit ? '' : '',
   // Vorbelegte Tags (später aus DB)
   'tags' => $isEdit ? [

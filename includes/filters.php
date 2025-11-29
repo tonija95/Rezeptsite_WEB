@@ -1,6 +1,6 @@
 <?php
 // ---- Zentrale Tag-Optionen ----
-function getTagOptions(): array {
+
   return [
     'meal'     => ['Frühstück','Mittagessen','Abendessen','Snack','Dessert'],
     'course'   => ['Vorspeise','Hauptgericht','Beilage','Suppe','Salat','Nachspeise'],
