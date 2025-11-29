@@ -1,117 +1,158 @@
 <?php
-$pageTitle = 'Admin: Rezepte verwalten';
+$pageTitle = 'Rezepte verwalten (Admin)';
 $role = 'admin';
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-/* === Zentrale Optionen + Filter-Logik laden === */
-$TAG_OPTIONS = require __DIR__ . '/../includes/tag_options.php'; // nur hier definieren
-require_once __DIR__ . '/../includes/filters.php';               // normalize + filter-Funktionen
+require_once __DIR__ . '/../includes/pre datatable/get_options.php';
+require_once __DIR__ . '/../includes/pre datatable/recipe_examples.php';
+require_once __DIR__ . '/../includes/filters.php';
 
-/* === Dummy-Daten (bis DB da ist) === */
-$recipes = [
-  [
-    'id'=>1, 'title'=>'Spaghetti Aglio e Olio', 'user'=>'anna',
-    'meal'=>['Abendessen'], 'course'=>['Hauptgericht'], 'cuisine'=>['Italienisch'],
-    'level'=>['Einfach'], 'specials'=>['Schnelle Küche','Vegetarisch'],
-    'created'=>'2025-10-22'
-  ],
-  [
-    'id'=>2, 'title'=>'Ramen mit Ei', 'user'=>'max',
-    'meal'=>['Mittagessen'], 'course'=>['Hauptgericht'], 'cuisine'=>['Asiatisch'],
-    'level'=>['Mittel'], 'specials'=>['Proteinreich'],
-    'created'=>'2025-10-21'
-  ],
-  [
-    'id'=>3, 'title'=>'Pancakes', 'user'=>'sara',
-    'meal'=>['Frühstück','Dessert'], 'course'=>['Nachspeise'], 'cuisine'=>['Deutsch'],
-    'level'=>['Einfach'], 'specials'=>['Vegetarisch'],
-    'created'=>'2025-10-19'
-  ],
-];
-
-/* === GET → normalisieren → filtern === */
-$filters  = normalizeRecipeFilters($_GET);       // sorgt für Arrays bei meal/course/...
-$filtered = filterRecipesArray($recipes, $filters);
+$allRecipes  = getExampleRecipes();
+$tagFilters  = normalizeTagFilters($_GET);
+$filtered    = filterRecipesByTags($allRecipes, $tagFilters);
+$filtersOpen = !empty($_GET);
 ?>
-
 <div class="container">
 
-  <!-- Hero -->
   <section class="hero section my-3 my-md-4">
-    <h1 class="h3 mb-2">Admin · Rezepte verwalten</h1>
-    <p class="text-muted">Übersicht aller Rezepte. Du kannst filtern oder löschen.</p>
+    <h1 class="h3 mb-2">Rezepte verwalten</h1>
+    <p class="text-muted">Übersicht aller Rezepte im System – bearbeiten, löschen oder Details ansehen.</p>
   </section>
 
-  <!-- FILTER: Collapsible mit Unter-Dropdowns -->
   <section class="section bg-cream mb-3 mb-md-4 py-3 px-3">
     <div class="d-flex justify-content-between align-items-center">
       <h2 class="h5 m-0">Filter</h2>
-      <?php $filtersOpen = !empty($_GET); ?>
-      <button class="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#recipeFilters"
-              aria-expanded="<?= $filtersOpen ? 'true' : 'false' ?>"
-              aria-controls="recipeFilters">
+      <button
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#recipeFilters"
+        aria-expanded="<?= $filtersOpen ? 'true' : 'false' ?>"
+        aria-controls="recipeFilters">
         <span><?= $filtersOpen ? 'Filter verbergen' : 'Filter anzeigen' ?></span>
         <span class="chev" aria-hidden="true">▾</span>
       </button>
     </div>
 
     <div id="recipeFilters" class="collapse <?= $filtersOpen ? 'show' : '' ?> mt-3">
-      <?php
-        // Variablen, die das Include benötigt:
-        $showUserFilter = true;   // Admin darf nach User filtern
-        // $filters und $TAG_OPTIONS sind bereits gesetzt
-        include __DIR__ . '/../includes/components/filter_recipes.php';
-      ?>
+      <?= renderTagFilterForm($tagFilters); ?>
     </div>
   </section>
 
-  <!-- Tabelle -->
-  <section class="section mb-3 mb-md-4">
-    <div class="table-responsive">
-      <table class="table table-striped align-middle">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Titel</th>
-            <th>User</th>
-            <th>Kategorien</th>
-            <th>Datum</th>
-            <th class="text-end">Aktionen</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if (empty($filtered)): ?>
-            <tr><td colspan="6" class="text-center text-muted py-4">Keine Rezepte gefunden.</td></tr>
-          <?php else: ?>
-            <?php foreach ($filtered as $r): ?>
+  <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
+    <h2 class="h5 mb-3">Alle Rezepte (<?= count($filtered) ?>)</h2>
+    
+    <?php if (empty($filtered)): ?>
+      <p class="text-muted">Keine Rezepte gefunden.</p>
+    <?php else: ?>
+      
+      <!-- Mobile: Card-Layout -->
+      <div class="d-md-none">
+        <?php foreach ($filtered as $r): ?>
+          <?php
+            $id = (int)($r['id'] ?? 0);
+            $badges = [];
+            if (!empty($r['tags']) && is_array($r['tags'])) {
+              foreach ($r['tags'] as $vals) {
+                if (is_array($vals)) {
+                  foreach ($vals as $v) {
+                    $v = trim((string)$v);
+                    if ($v !== '') $badges[] = esc($v);
+                  }
+                } else {
+                  $v = trim((string)$vals);
+                  if ($v !== '') $badges[] = esc($v);
+                }
+              }
+            }
+          ?>
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h3 class="h6 mb-1"><?= esc($r['title'] ?? 'Unbenannt') ?></h3>
+                  <small class="text-muted">@<?= esc($r['user'] ?? 'Unbekannt') ?></small>
+                </div>
+              </div>
+              <div class="d-flex gap-2 mt-3">
+                <a href="recipe.php?id=<?= $id ?>" class="btn btn-outline-secondary btn-sm flex-fill">Ansehen</a>
+                <a href="admin_recipe_delete.php?id=<?= $id ?>" class="btn btn-danger btn-sm flex-fill">Löschen</a>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- Desktop: Tabellen-Layout -->
+      <div class="d-none d-md-block">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
               <tr>
-                <td><?= (int)$r['id'] ?></td>
-                <td><?= htmlspecialchars($r['title']) ?></td>
-                <td><?= htmlspecialchars($r['user']) ?></td>
-                <td>
-                  <?php foreach (array_merge($r['meal'],$r['course'],$r['cuisine'],$r['level'],$r['specials']) as $t): ?>
-                    <span class="badge me-1 mb-1"><?= htmlspecialchars($t) ?></span>
-                  <?php endforeach; ?>
-                </td>
-                <td><?= htmlspecialchars($r['created']) ?></td>
-                <td class="text-end">
-                  <a href="recipe.php?id=<?= (int)$r['id'] ?>" class="btn btn-sm btn-outline-secondary">Ansehen</a>
-                  <a href="admin_recipe_delete.php?id=<?= (int)$r['id'] ?>"
-                     class="btn btn-sm btn-danger"
-                     onclick="return confirm('Rezept wirklich löschen?');">Löschen</a>
-                </td>
+                <th>Titel</th>
+                <th>User</th>
+                <th>Zeit (Min)</th>
+                <th>Portionen</th>
+                <th>Tags</th>
+                <th>Aktionen</th>
               </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+            </thead>
+            <tbody>
+              <?php foreach ($filtered as $r): ?>
+                <?php
+                  $id = (int)($r['id'] ?? 0);
+                  $badges = [];
+                  if (!empty($r['tags']) && is_array($r['tags'])) {
+                    foreach ($r['tags'] as $vals) {
+                      if (is_array($vals)) {
+                        foreach ($vals as $v) {
+                          $v = trim((string)$v);
+                          if ($v !== '') $badges[] = esc($v);
+                        }
+                      } else {
+                        $v = trim((string)$vals);
+                        if ($v !== '') $badges[] = esc($v);
+                      }
+                    }
+                  }
+                ?>
+                <tr>
+                  <td>
+                    <strong><?= esc($r['title'] ?? 'Unbenannt') ?></strong>
+                    <?php if (!empty($r['description'])): ?>
+                      <br><small class="text-muted"><?= esc(mb_substr($r['description'], 0, 60)) ?>...</small>
+                    <?php endif; ?>
+                  </td>
+                  <td><?= esc($r['user'] ?? 'Unbekannt') ?></td>
+                  <td><?= (int)($r['time_minutes'] ?? 0) ?></td>
+                  <td><?= (int)($r['servings'] ?? 0) ?></td>
+                  <td>
+                    <?php foreach (array_slice($badges, 0, 3) as $b): ?>
+                      <span class="badge me-1"><?= $b ?></span>
+                    <?php endforeach; ?>
+                    <?php if (count($badges) > 3): ?>
+                      <small class="text-muted">+<?= count($badges) - 3 ?></small>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2 flex-wrap">
+                      <a href="recipe.php?id=<?= $id ?>" class="btn btn-outline-secondary btn-sm">Ansehen</a>
+                      <a href="admin_recipe_delete.php?id=<?= $id ?>" class="btn btn-danger btn-sm">Löschen</a>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <?php endif; ?>
   </section>
 
 </div>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>
 

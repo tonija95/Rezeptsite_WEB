@@ -8,11 +8,6 @@ include __DIR__ . '/../includes/nav.php';
 require_once __DIR__ . '/../includes/pre datatable/recipe_examples.php';
 require_once __DIR__ . '/../includes/components/recipe_cards.php';
 
-// Escape-Helfer (kollisionssicher)
-if (!function_exists('esc')) {
-  function esc($s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
-}
-
 // id aus GET
 $id = isset($_GET['id']) && ctype_digit($_GET['id']) ? (int)$_GET['id'] : 0;
 
