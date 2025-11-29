@@ -7,22 +7,16 @@ if (!function_exists('esc')) {
     }
 }
 
-function renderRecipeCard(array $r, bool $showActions = false): string {
+function renderRecipeCard(array $r, $actions = ['view']): string {
     $img  = !empty($r['image_url']) ? $r['image_url'] : 'img/placeholder_food.jpg';
     $id   = isset($r['id']) ? (int)$r['id'] : 0;
     $link = $id ? 'recipe.php?id=' . $id : 'recipe.php';
 
-    // Alle Badge-Texte aus allen Tag-Kategorien sammeln
     $badges = [];
     if (!empty($r['tags']) && is_array($r['tags'])) {
         foreach ($r['tags'] as $vals) {
-            if (is_array($vals)) {
-                foreach ($vals as $v) {
-                    $v = trim((string)$v);
-                    if ($v !== '') $badges[] = esc($v);
-                }
-            } else {
-                $v = trim((string)$vals);
+            foreach ((array)$vals as $v) {
+                $v = trim((string)$v);
                 if ($v !== '') $badges[] = esc($v);
             }
         }
@@ -42,28 +36,58 @@ function renderRecipeCard(array $r, bool $showActions = false): string {
     }
     $html .= '<h3 class="card-title h5 mb-2">'.$title.'</h3>';
     if ($desc) $html .= '<p class="card-text text-muted">'.$desc.'</p>';
-    
-    if ($showActions) {
-        $html .= '<div class="mt-auto d-flex gap-2 flex-wrap">';
-        $html .= '<a href="'.esc($link).'" class="btn btn-outline-secondary btn-sm flex-fill">Ansehen</a>';
-        $html .= '<a href="user_recipe-edit.php?id='.$id.'" class="btn btn-primary btn-sm flex-fill">Bearbeiten</a>';
-        $html .= '<a href="user_recipe_delete.php?id='.$id.'" class="btn btn-danger btn-sm flex-fill">Löschen</a>';
-        $html .= '</div>';
-    } else {
-        $html .= '<a href="'.esc($link).'" class="btn btn-outline-secondary mt-auto">Ansehen</a>';
-    }
-    
-    $html .= '</div></div></div>';
 
+    $html .= '<div class="mt-auto d-flex gap-2 flex-wrap">';
+    if (in_array('view', $actions, true)) {
+        $html .= '<a href="'.esc($link).'" class="btn btn-outline-secondary btn-sm">Ansehen</a>';
+    }
+    if ($id && in_array('delete', $actions, true)) {
+        // ZENTRALER DELETE: POST an recipe_delete.php
+        $html .= '<form method="post" action="recipe_delete.php" class="d-inline">';
+        $html .= '<input type="hidden" name="id" value="'.$id.'">';
+        $html .= '<button type="submit" class="btn btn-danger btn-sm">Löschen</button>';
+        $html .= '</form>';
+    }
+    $html .= '</div>';
+
+    $html .= '</div></div></div>';
     return $html;
 }
 
-function renderRecipeCards(int $count = 6, ?array $recipes = null, bool $showActions = false): string {
-    if (!is_array($recipes) || $count <= 0) return '';
-    $slice = array_slice($recipes, 0, $count);
-    $out = '';
-    foreach ($slice as $r) { $out .= renderRecipeCard($r, $showActions); }
-    return $out;
+function renderRecipeCards(int $count, array $recipes, array $actions = []): string {
+    ob_start();
+    ?>
+    <?php foreach ($recipes as $r): ?>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100">
+                <?php $img = !empty($r['image_url']) ? $r['image_url'] : 'img/placeholder_food.jpg'; ?>
+                <img class="card-img-top" src="<?= htmlspecialchars($img) ?>" onerror="this.onerror=null;this.src='img/placeholder_food.jpg';" alt="">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="h6 mb-2"><?= htmlspecialchars($r['title'] ?? 'Unbenannt') ?></h3>
+
+                    <div class="mt-auto d-flex gap-2">
+                        <?php if (in_array('view', $actions, true)): ?>
+                            <a class="btn btn-outline-secondary btn-sm" href="recipe.php?id="<?= (int)($r['id'] ?? 0) ?>">Ansehen</a>
+                        <?php endif; ?>
+
+                        <?php if (in_array('edit', $actions, true)): ?>
+                            <a class="btn btn-primary btn-sm" href="user_recipe_edit.php?id=<?= (int)($r['id'] ?? 0) ?>">Bearbeiten</a>
+                        <?php endif; ?>
+
+                        <?php if (in_array('delete', $actions, true)): ?>
+                            <!-- ZENTRALER DELETE: POST an recipe_delete.php -->
+                            <form method="post" action="recipe_delete.php" class="d-inline">
+                                <input type="hidden" name="id" value="<?= (int)($r['id'] ?? 0) ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+    <?php
+    return ob_get_clean();
 }
 
 // Kompakte Karte (gleiches Badge-/Button-Verhalten)

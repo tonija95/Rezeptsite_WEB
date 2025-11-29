@@ -1,53 +1,56 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION['user'])) { $_SESSION['user'] = 'anna'; }
+
+require_once __DIR__ . '/../includes/data/recipes_store.php';
+require_once __DIR__ . '/../includes/filters.php';
+require_once __DIR__ . '/../includes/pre datatable/get_options.php';
+
 $pageTitle = 'Rezepte';
-$role = 'admin';
+$role = 'guest';
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-require_once __DIR__ . '/../includes/pre datatable/get_options.php';
-require_once __DIR__ . '/../includes/pre datatable/recipe_examples.php';
-require_once __DIR__ . '/../includes/filters.php';
-require_once __DIR__ . '/../includes/components/recipe_cards.php';
-
-$allRecipes  = getExampleRecipes();
-$tagFilters  = normalizeTagFilters($_GET);
-$filtered    = filterRecipesByTags($allRecipes, $tagFilters);
-$filtersOpen = !empty($_GET);
+$allRecipes = recipesAll();
+$filters    = normalizeTagFilters($_GET ?? []);
+$recipes    = filterRecipesByTags($allRecipes, $filters);
 ?>
 <div class="container">
-
-  <section class="hero section my-3 my-md-4">
-    <h1 class="h3 mb-2">Rezepte durchstöbern</h1>
-    <p class="text-muted">Hier findest du Rezepte aus unserer Community – nach Lust, Laune und Geschmack.</p>
-  </section>
-
-  <section class="section bg-cream mb-3 mb-md-4 py-3 px-3">
-    <div class="d-flex justify-content-between align-items-center">
-      <h2 class="h5 m-0">Filter</h2>
-      <button
-        class="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#recipeFilters"
-        aria-expanded="<?= $filtersOpen ? 'true' : 'false' ?>"
-        aria-controls="recipeFilters">
-        <span><?= $filtersOpen ? 'Filter verbergen' : 'Filter anzeigen' ?></span>
-        <span class="chev" aria-hidden="true">▾</span>
-      </button>
-    </div>
-
-    <div id="recipeFilters" class="collapse <?= $filtersOpen ? 'show' : '' ?> mt-3">
-      <?= renderTagFilterForm($tagFilters); ?>
+  <section class="hero section my-3 my-md-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+    <div>
+      <h1 class="h3 mb-2">Alle Rezepte</h1>
+      <p class="text-muted mb-0">Entdecke alle vorhandenen Rezepte.</p>
     </div>
   </section>
+
+  <?= renderTagFilterSection($filters) ?>
 
   <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
     <div class="row g-3">
-      <?= renderRecipeCards(count($filtered), $filtered); ?>
+      <?php foreach ($recipes as $r): ?>
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card h-100">
+            <?php $img = !empty($r['image_url']) ? $r['image_url'] : 'img/placeholder_food.jpg'; ?>
+            <img class="card-img-top" src="<?= htmlspecialchars($img) ?>" onerror="this.onerror=null;this.src='img/placeholder_food.jpg';" alt="">
+            <div class="card-body d-flex flex-column">
+              <h3 class="h6 mb-2"><?= htmlspecialchars($r['title'] ?? 'Unbenannt') ?></h3>
+              <?php if (!empty($r['description'])): ?>
+                <p class="text-muted small mb-3"><?= htmlspecialchars($r['description']) ?></p>
+              <?php endif; ?>
+              <div class="mt-auto d-flex gap-2">
+                <a class="btn btn-outline-secondary btn-sm" href="recipe.php?id=<?= (int)($r['id'] ?? 0) ?>">Ansehen</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+      <?php if (empty($recipes)): ?>
+        <div class="col-12"><p class="text-muted">Keine Rezepte gefunden.</p></div>
+      <?php endif; ?>
     </div>
   </section>
 </div>
-
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 
