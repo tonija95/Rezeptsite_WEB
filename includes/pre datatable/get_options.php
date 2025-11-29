@@ -15,3 +15,16 @@ return [
   function getUnitOptions(): array {
   return ['Stk','g','ml','TL','EL','Prise'];
 }
+
+// Deutsche Labels für Tag-Kategorien
+if (!function_exists('getTagCategoryLabels')) {
+    function getTagCategoryLabels(): array {
+        return [
+            'meal'     => 'Mahlzeit',
+            'course'   => 'Gang',
+            'cuisine'  => 'Küche',
+            'level'    => 'Schwierigkeit',
+            'specials' => 'Besonderheiten',
+        ];
+    }
+}

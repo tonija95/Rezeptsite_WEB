@@ -5,22 +5,23 @@ $role = 'admin';
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-// Dummy-KPIs (später via DB)
+// Session + Admin-Rolle setzen
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+$_SESSION['role'] = 'admin';
+if (empty($_SESSION['user'])) { $_SESSION['user'] = 'anna'; }
+
+// Daten laden
+require_once __DIR__ . '/../includes/data/recipes_store.php';
+$allRecipes = recipesAll();
+$recentRecipes = array_slice(array_reverse($allRecipes), 0, 5);
+
+// Dummy-KPIs
 $stats = [
   'total_users'       => 128,
-  'total_recipes'     => 342,
+  'total_recipes'     => count($allRecipes),
   'new_users_7d'      => 6,
   'new_recipes_7d'    => 19,
-  'flagged_recipes'   => 2,  // gemeldete/zu prüfen
-];
-
-// Dummy: letzte Rezepte
-$recentRecipes = [
-  ['id'=>351, 'title'=>'Tomatenrisotto', 'user'=>'anna', 'created'=>'2025-10-26', 'tags'=>['Italienisch','Hauptgericht']],
-  ['id'=>350, 'title'=>'Schneller Couscous-Salat', 'user'=>'max', 'created'=>'2025-10-26', 'tags'=>['Schnelle Küche','Salat']],
-  ['id'=>349, 'title'=>'Vegane Kürbissuppe', 'user'=>'sara', 'created'=>'2025-10-25', 'tags'=>['Vegan','Suppe']],
-  ['id'=>348, 'title'=>'Apfelpfannkuchen', 'user'=>'lena', 'created'=>'2025-10-24', 'tags'=>['Frühstück','Dessert']],
-  ['id'=>347, 'title'=>'Ramen mit Ei', 'user'=>'max', 'created'=>'2025-10-23', 'tags'=>['Asiatisch','Hauptgericht']],
+  'flagged_recipes'   => 2,
 ];
 
 // Dummy: neue Nutzer
@@ -28,12 +29,6 @@ $newUsers = [
   ['id'=>129, 'username'=>'lena', 'email'=>'lena@example.com', 'joined'=>'2025-10-26'],
   ['id'=>128, 'username'=>'flo',  'email'=>'flo@example.com',  'joined'=>'2025-10-25'],
   ['id'=>127, 'username'=>'timo', 'email'=>'timo@example.com', 'joined'=>'2025-10-24'],
-];
-
-// Dummy: gemeldete Rezepte (zu prüfen)
-$flagged = [
-  ['id'=>333, 'title'=>'XYZ Rezept', 'reason'=>'Unpassender Inhalt', 'reported_at'=>'2025-10-25'],
-  ['id'=>326, 'title'=>'Seltsames Rezept', 'reason'=>'Spam-Verdacht',   'reported_at'=>'2025-10-22'],
 ];
 ?>
 <div class="container">
@@ -89,7 +84,7 @@ $flagged = [
     </div>
   </section>
 
-  <!-- 2-Spalten: Links letzte Rezepte, rechts neue Nutzer + gemeldete -->
+  <!-- 2-Spalten: Links letzte Rezepte, rechts neue Nutzer -->
   <section class="section bg-cream mb-3 mb-md-4">
     <div class="row g-3">
       <!-- Letzte Rezepte -->
@@ -106,39 +101,49 @@ $flagged = [
                 <th>Titel</th>
                 <th class="d-none d-sm-table-cell">User</th>
                 <th class="d-none d-md-table-cell">Tags</th>
-                <th>Datum</th>
                 <th class="text-end">Aktionen</th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($recentRecipes as $r): ?>
                 <tr>
-                  <td class="fw-semibold"><?= htmlspecialchars($r['title']) ?></td>
-                  <td class="d-none d-sm-table-cell"><?= htmlspecialchars($r['user']) ?></td>
+                  <td class="fw-semibold"><?= htmlspecialchars($r['title'] ?? 'Unbenannt') ?></td>
+                  <td class="d-none d-sm-table-cell"><?= htmlspecialchars($r['user'] ?? '') ?></td>
                   <td class="d-none d-md-table-cell">
-                    <?php foreach (($r['tags'] ?? []) as $t): ?>
+                    <?php
+                      $badges = [];
+                      if (!empty($r['tags']) && is_array($r['tags'])) {
+                        foreach ($r['tags'] as $vals) {
+                          foreach ((array)$vals as $v) { $v = trim((string)$v); if ($v !== '') $badges[] = $v; }
+                        }
+                      }
+                      foreach (array_slice($badges, 0, 3) as $t):
+                    ?>
                       <span class="badge me-1 mb-1"><?= htmlspecialchars($t) ?></span>
                     <?php endforeach; ?>
                   </td>
-                  <td class="text-muted small"><?= htmlspecialchars($r['created']) ?></td>
                   <td class="text-end">
-                    <a href="recipe.php?id=<?= (int)$r['id'] ?>" class="btn btn-sm btn-outline-secondary">Ansehen</a>
-                    <a href="admin_recipe_delete.php?id=<?= (int)$r['id'] ?>" class="btn btn-sm btn-danger"
-                       onclick="return confirm('Rezept wirklich löschen?');">Löschen</a>
+                    <div class="d-flex gap-1 justify-content-end">
+                      <a href="recipe.php?id=<?= (int)($r['id'] ?? 0) ?>" class="btn btn-sm btn-outline-secondary">Ansehen</a>
+                      <!-- Zentraler Delete: POST an recipe_delete.php -->
+                      <form method="post" action="recipe_delete.php" class="d-inline">
+                        <input type="hidden" name="id" value="<?= (int)($r['id'] ?? 0) ?>">
+                        <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
               <?php if (empty($recentRecipes)): ?>
-                <tr><td colspan="5" class="text-center text-muted py-4">Keine Einträge.</td></tr>
+                <tr><td colspan="4" class="text-center text-muted py-4">Keine Einträge.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Rechte Spalte: Neue Nutzer & Gemeldete -->
+      <!-- Rechte Spalte: Neue Nutzer -->
       <div class="col-12 col-lg-4">
-        <!-- Neue Nutzer -->
         <div class="section mb-3">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h2 class="h6 m-0">Neue Nutzer</h2>
@@ -159,9 +164,7 @@ $flagged = [
             <?php endif; ?>
           </ul>
         </div>
-
-
-
+      </div>
     </div>
   </section>
 

@@ -15,7 +15,6 @@ require_once __DIR__ . '/../includes/components/recipe_cards.php';
 $allRecipes  = getExampleRecipes();
 $tagFilters  = normalizeTagFilters($_GET);
 $filtered    = filterRecipesByTags($allRecipes, $tagFilters);
-$filtersOpen = !empty($_GET);
 ?>
 <div class="container">
 
@@ -24,25 +23,7 @@ $filtersOpen = !empty($_GET);
     <p class="text-muted">Hier findest du alle Rezepte, die du als Favorit markiert hast.</p>
   </section>
 
-  <section class="section bg-cream mb-3 mb-md-4 py-3 px-3">
-    <div class="d-flex justify-content-between align-items-center">
-      <h2 class="h5 m-0">Filter</h2>
-      <button
-        class="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#recipeFilters"
-        aria-expanded="<?= $filtersOpen ? 'true' : 'false' ?>"
-        aria-controls="recipeFilters">
-        <span><?= $filtersOpen ? 'Filter verbergen' : 'Filter anzeigen' ?></span>
-        <span class="chev" aria-hidden="true">▾</span>
-      </button>
-    </div>
-
-    <div id="recipeFilters" class="collapse <?= $filtersOpen ? 'show' : '' ?> mt-3">
-      <?= renderTagFilterForm($tagFilters); ?>
-    </div>
-  </section>
+  <?= renderTagFilterSection($tagFilters) ?>
 
   <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
     <h2 class="h5 mb-3">Gespeicherte Favoriten</h2>
