@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Startseite';
-$role = 'guest';
+$role = 'admin';
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
@@ -102,8 +102,7 @@ function renderIndexCard(?array $r, string $title, string $subtitle = ''): strin
         <h1 class="display-6 mb-3">Willkommen auf unserer Rezeptseite!</h1>
         <p class="lead text-muted mb-4">Entdecke neue Lieblingsrezepte – frisch, vielfältig und einfach nachzukochen.</p>
         <div class="d-flex gap-2 justify-content-center flex-wrap">
-            <a href="recipes.php" class="btn btn-primary">Alle Rezepte entdecken</a>
-            <a href="user_recipe_edit.php" class="btn btn-outline-secondary">Eigenes Rezept erstellen</a>
+            <a href="recipes.php" class="btn btn-primary">Alle Rezepte entdecken</a>            
         </div>
     </section>
 
@@ -121,7 +120,7 @@ function renderIndexCard(?array $r, string $title, string $subtitle = ''): strin
     <section class="section text-center mb-5">
         <h2 class="h5 mb-3">Werde Teil unserer Community!</h2>
         <p class="text-muted mb-3">Teile deine Lieblingsrezepte und entdecke neue Gerichte von anderen Köchen.</p>
-        <a href="user_recipe_edit.php" class="btn btn-primary">Jetzt Rezept hochladen</a>
+        <a href="registration.php" class="btn btn-primary">Registrieren</a>
     </section>
 </div>
 

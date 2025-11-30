@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Rezept';
 // zum Testen kannst du hier 'guest' | 'user' | 'admin' setzen:
-$role = 'admin';
+$role = 'user';
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
@@ -122,9 +122,9 @@ $similar = array_slice($similar, 0, 3);
                 <?php foreach ($recipe['ingredients'] as $ing): ?>
                   <?php
                     if (is_array($ing)) {
-                      $qty  = trim((string)($ing['qty'] ?? ''));
+                      $qty  = trim((string)($ing['quantity'] ?? ''));
                       $unit = trim((string)($ing['unit'] ?? ''));
-                      $item = trim((string)($ing['item'] ?? ''));
+                      $item = trim((string)($ing['name'] ?? ''));
                       $line = trim($qty . ' ' . $unit . ' ' . $item);
                       if ($line !== '') echo '<li>'.esc($line).'</li>';
                     } else {
