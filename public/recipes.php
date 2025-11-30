@@ -33,12 +33,10 @@ if (file_exists(__DIR__ . '/../includes/pre datatable/recipe_examples.php')) {
 }
 
 // Zusammenführen (Store bevorzugt, Beispiele ergänzen falls Id nicht doppelt)
-$allRecipes = $storeRecipes;
-$existingIds = array_map(fn($r) => (int)($r['id'] ?? 0), $storeRecipes);
-foreach ($exampleRecipes as $ex) {
-    $id = (int)($ex['id'] ?? 0);
-    if ($id === 0 || in_array($id, $existingIds, true)) continue;
-    $allRecipes[] = $ex;
+if (!empty($storeRecipes)) {
+    $allRecipes = $storeRecipes;
+} else {
+    $allRecipes = $exampleRecipes;
 }
 
 // Filter normalisieren + anwenden
