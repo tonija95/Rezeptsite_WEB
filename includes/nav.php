@@ -1,6 +1,5 @@
 <?php
-session_start();
-
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // TEMP: Rolle mocken – später: $_SESSION['user']['role'] ?? 'guest'
 $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
     ? 'admin'

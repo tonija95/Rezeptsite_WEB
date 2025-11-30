@@ -1,6 +1,5 @@
 <?php
-
-
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Zugriff nur für eingeloggte Nutzer
 if (!isset($_SESSION['user'])) {
     header('Location: index.php');

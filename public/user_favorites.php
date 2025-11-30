@@ -1,7 +1,7 @@
 <!-- Favoriten – Liste der Favoriten (Platzhalter) -->
 
 <?php
-
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 // Restrict access to logged-in users
 if (!isset($_SESSION['user'])) {

@@ -1,6 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $pageTitle = 'Admin: User verwalten';
-$role = 'admin';
+
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
