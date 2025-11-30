@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 
 // Entfernt automatische Anmeldung für 'anna'
 if (!isset($_SESSION['user']) && !isset($_SESSION['admin_logged_in'])) {

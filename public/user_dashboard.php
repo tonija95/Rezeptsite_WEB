@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 
 // Zugriff nur für eingeloggte Nutzer
 if (!isset($_SESSION['user'])) {
