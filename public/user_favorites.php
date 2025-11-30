@@ -1,8 +1,17 @@
 <!-- Favoriten – Liste der Favoriten (Platzhalter) -->
 
 <?php
+session_start();
+
+// Restrict access to logged-in users
+if (!isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = 'Meine Favoriten';
 $role = 'user'; // temporär
+
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 

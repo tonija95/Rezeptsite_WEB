@@ -1,6 +1,10 @@
 <?php
+session_start();
+
 // TEMP: Rolle mocken – später: $_SESSION['user']['role'] ?? 'guest'
-$role = $role ?? 'admin';
+$role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
+    ? 'admin'
+    : (isset($_SESSION['user']) ? 'user' : 'guest');
 ?>
 <nav class="navbar navbar-expand-md navbar-dark site-navbar sticky-top"> <!-- navbar-dark bg-dark -->
   <div class="container">
@@ -65,9 +69,9 @@ $role = $role ?? 'admin';
   <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="loginDropdown" style="min-width: 260px;">
     <form action="login_process.php" method="post">
       <div class="mb-3">
-        <label for="dropdownEmail" class="form-label">E-Mail-Adresse</label>
-        <input type="email" class="form-control" id="dropdownEmail" name="email"
-               placeholder="email@example.com" required>
+        <label for="dropdownUsername" class="form-label">Benutzername</label>
+        <input type="text" class="form-control" id="dropdownUsername" name="username"
+               placeholder="Benutzername" required>
       </div>
 
       <div class="mb-3">
@@ -92,3 +96,9 @@ $role = $role ?? 'admin';
   </div>
 </nav>
 <main>
+<?php
+if (isset($_SESSION['login_error'])) {
+    echo '<script>alert("' . htmlspecialchars($_SESSION['login_error']) . '");</script>';
+    unset($_SESSION['login_error']);
+}
+?>

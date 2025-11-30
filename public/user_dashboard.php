@@ -1,13 +1,18 @@
 <?php
+session_start();
+
+// Zugriff nur für eingeloggte Nutzer
+if (!isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = 'Dein Dashboard';
 $role = 'user';
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-// Session + Default-User
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (empty($_SESSION['user'])) { $_SESSION['user'] = 'anna'; }
 $currentUser = $_SESSION['user'];
 
 // Daten laden
@@ -26,9 +31,9 @@ $stats = [
 ?>
 <div class="container">
 
-  <!-- Hero -->
+  <!-- Begrüßung -->
   <section class="hero section my-3 my-md-4">
-    <h1 class="h3 mb-2">Willkommen zurück, <?= htmlspecialchars($currentUser) ?>!</h1>
+    <h1 class="h3 mb-2">Willkommen, <?= htmlspecialchars($currentUser) ?>!</h1>
     <p class="text-muted">Dein persönliches Dashboard – Schnellzugriff auf deine Rezepte und Favoriten.</p>
   </section>
 

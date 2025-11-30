@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Restrict access to logged-in users
+if (!isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit;
+}
+
 // ---------------------------------------------------------
 // Create vs. Edit erkennen
 // ---------------------------------------------------------

@@ -21,3 +21,14 @@ include __DIR__ . '/../includes/nav.php';
 
 </div>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php
+session_start();
+
+// Clear all session data
+session_unset();
+session_destroy();
+
+// Redirect to index page
+header('Location: index.php');
+exit;
+?>

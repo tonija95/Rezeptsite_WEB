@@ -80,16 +80,15 @@ include __DIR__ . '/../includes/nav.php';
   <p class="text-muted">Melde dich an, um deine Rezepte zu verwalten und neue Ideen zu entdecken.</p>
 
   <form action="login_process.php" method="post" class="row g-3">
-    <!-- E-Mail -->
+    <!-- Benutzername -->
     <div class="col-12">
-      <label for="loginEmail" class="form-label">E-Mail-Adresse</label>
+      <label for="loginUsername" class="form-label">Benutzername</label>
       <input
-        type="email"
+        type="text"
         class="form-control"
-        id="loginEmail"
-        name="email"
-        placeholder="email@example.com"
-        autocomplete="email"
+        id="loginUsername"
+        name="username"
+        placeholder="Benutzername"
         required
       >
     </div>
@@ -102,20 +101,23 @@ include __DIR__ . '/../includes/nav.php';
         class="form-control"
         id="loginPassword"
         name="password"
-        autocomplete="current-password"
         required
       >
     </div>
-
 
     <!-- Absenden -->
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Anmelden</button>
     </div>
-
-
   </form>
 </section>
 
 </div>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php
+include __DIR__ . '/../includes/footer.php';
+
+if (isset($_SESSION['login_error'])) {
+    echo '<script>alert("' . htmlspecialchars($_SESSION['login_error']) . '");</script>';
+    unset($_SESSION['login_error']);
+}
+?>

@@ -1,12 +1,18 @@
 <?php
+session_start();
+
+// Restrict access to logged-in users
+if (!isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = 'Meine Rezepte';
-$role = 'user'; // temporär
+$role = 'user';
+
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-// Session + Default-User
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (empty($_SESSION['user'])) { $_SESSION['user'] = 'anna'; }
 $currentUser = $_SESSION['user'];
 
 // Daten laden

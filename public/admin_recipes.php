@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = 'Rezepte verwalten (Admin)';
 $role = 'admin';
 
@@ -6,9 +14,7 @@ include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
 // Session + Admin-Rolle setzen
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $_SESSION['role'] = 'admin';
-if (empty($_SESSION['user'])) { $_SESSION['user'] = 'anna'; }
 
 require_once __DIR__ . '/../includes/pre datatable/get_options.php';
 require_once __DIR__ . '/../includes/data/recipes_store.php';
