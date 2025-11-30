@@ -8,7 +8,6 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
 <nav class="navbar navbar-expand-md navbar-dark site-navbar sticky-top"> <!-- navbar-dark bg-dark -->
   <div class="container">
     <a class="navbar-brand" href="index.php">Mein persönliches Kochbuch</a>
-   
 
     <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -23,7 +22,8 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
           <a class="nav-link px-0 px-md-2" href="recipes.php">Rezepte</a>
         </li>
 
-        <?php if ($role !== 'guest'): ?>
+        <!-- User-spezifische Links: nur für normale Nutzer anzeigen -->
+        <?php if ($role === 'user'): ?>
           <li class="nav-item">
             <a class="nav-link px-0 px-md-2" href="user_dashboard.php">Dashboard</a>
           </li>
@@ -38,18 +38,16 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
           </li>
         <?php endif; ?>
 
+        <!-- Admin: eigene Links nebeneinander wie bei User -->
         <?php if ($role === 'admin'): ?>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle px-0 px-md-2"
-               href="#" id="adminMenu" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">
-              Admin
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="adminMenu">
-              <li><a class="dropdown-item" href="admin.php">Admin Panel</a></li>
-              <li><a class="dropdown-item" href="admin_users.php">User</a></li>
-              <li><a class="dropdown-item" href="admin_recipes.php">Rezepte verwalten</a></li>
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link px-0 px-md-2" href="admin.php">Admin Panel</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-0 px-md-2" href="admin_users.php">User</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-0 px-md-2" href="admin_recipes.php">Rezepte verwalten</a>
           </li>
         <?php endif; ?>
       </ul>
@@ -64,7 +62,6 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
     Login
   </button>
 
-
   <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="loginDropdown" style="min-width: 260px;">
     <form action="login_process.php" method="post">
       <div class="mb-3">
@@ -78,7 +75,6 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
         <input type="password" class="form-control" id="dropdownPassword" name="password"
                placeholder="••••••••" required>
       </div>
-
 
       <button type="submit" class="btn btn-primary w-100">Anmelden</button>
     </form>
