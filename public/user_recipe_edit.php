@@ -46,7 +46,7 @@ $recipe = [
   ];
 
 // CSRF
-session_start();
+
 if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(16)); }
 $csrf = $_SESSION['csrf'];
 

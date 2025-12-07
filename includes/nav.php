@@ -93,7 +93,9 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
 <main>
 <?php
 if (isset($_SESSION['login_error'])) {
-    echo '<script>alert("' . htmlspecialchars($_SESSION['login_error']) . '");</script>';
+    echo '<div class="container mt-3"><div class="alert alert-danger alert-dismissible fade show" role="alert">'
+        . htmlspecialchars($_SESSION['login_error']) .
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button></div></div>';
     unset($_SESSION['login_error']);
 }
 ?>
