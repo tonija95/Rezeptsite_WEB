@@ -98,8 +98,8 @@ main {
 
 /* badges für Rezeptkeywords */
 .badge{
-  background:var(--color-accent);
-  color:var(--color-dark);
+  background:var(--color-accent) !important;
+  color:var(--color-dark) !important;
 }
 
 /* =========================================================
@@ -255,3 +255,4 @@ main {
   color:#fff;
   text-decoration:none;
 }
+

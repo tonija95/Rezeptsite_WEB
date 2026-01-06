@@ -1,11 +1,21 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// TEMP: Rolle mocken – später: $_SESSION['user']['role'] ?? 'guest'
-$role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
-    ? 'admin'
-    : (isset($_SESSION['user']) ? 'user' : 'guest');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// User ist nur eingeloggt, wenn user_id vorhanden ist
+$isLoggedIn = isset($_SESSION['user_id'])
+    && is_numeric($_SESSION['user_id'])
+    && (int)$_SESSION['user_id'] > 0;
+
+if ($isLoggedIn) {
+    $role = isset($_SESSION['role']) ? (string)$_SESSION['role'] : 'user';
+} else {
+    $role = 'guest';
+}
 ?>
-<nav class="navbar navbar-expand-md navbar-dark site-navbar sticky-top"> <!-- navbar-dark bg-dark -->
+
+<nav class="navbar navbar-expand-md navbar-dark site-navbar sticky-top">
   <div class="container">
     <a class="navbar-brand" href="index.php">Mein persönliches Kochbuch</a>
 
@@ -22,23 +32,26 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
           <a class="nav-link px-0 px-md-2" href="recipes.php">Rezepte</a>
         </li>
 
-        <!-- User-spezifische Links: nur für normale Nutzer anzeigen -->
+        <!-- User-spezifische Links -->
         <?php if ($role === 'user'): ?>
           <li class="nav-item">
-            <a class="nav-link px-0 px-md-2" href="user_dashboard.php">Dashboard</a>
+            <a class="nav-link text-nowrap px-0 px-md-2" href="user_my_recipes.php">
+              Meine Rezepte
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-nowrap px-0 px-md-2" href="user_my_recipes.php">Meine Rezepte</a>
+            <a class="nav-link px-0 px-md-2" href="user_favorites.php">
+              Favoriten
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link px-0 px-md-2" href="user_favorites.php">Favoriten</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link px-0 px-md-2" href="user_shopping_list.php">Einkaufsliste</a>
+            <a class="nav-link px-0 px-md-2" href="user_shopping_list.php">
+              Einkaufsliste
+            </a>
           </li>
         <?php endif; ?>
 
-        <!-- Admin: eigene Links nebeneinander wie bei User -->
+        <!-- Admin -->
         <?php if ($role === 'admin'): ?>
           <li class="nav-item">
             <a class="nav-link px-0 px-md-2" href="admin.php">Admin Panel</a>
@@ -52,37 +65,48 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
         <?php endif; ?>
       </ul>
 
-      <!-- Rechts: Login/Logout als Button -->
+      <!-- Rechts: Login / Logout -->
       <div class="d-flex ms-md-3">
         <?php if ($role === 'guest'): ?>
-<div class="dropdown dropdown-login">
+          <div class="dropdown dropdown-login">
+            <button class="btn btn-login dropdown-toggle" type="button"
+                    id="loginDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              Login
+            </button>
 
-  <button class="btn btn-login dropdown-toggle" type="button" id="loginDropdown"
-          data-bs-toggle="dropdown" aria-expanded="false">
-    Login
-  </button>
+            <div class="dropdown-menu dropdown-menu-end p-3"
+                 aria-labelledby="loginDropdown" style="min-width:260px;">
+              <form action="login_process.php" method="post">
+                <div class="mb-3">
+                  <label for="dropdownUsername" class="form-label">
+                    Benutzername
+                  </label>
+                  <input type="text" class="form-control"
+                         id="dropdownUsername" name="username"
+                         required>
+                </div>
 
-  <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="loginDropdown" style="min-width: 260px;">
-    <form action="login_process.php" method="post">
-      <div class="mb-3">
-        <label for="dropdownUsername" class="form-label">Benutzername</label>
-        <input type="text" class="form-control" id="dropdownUsername" name="username"
-               placeholder="Benutzername" required>
-      </div>
+                <div class="mb-3">
+                  <label for="dropdownPassword" class="form-label">
+                    Passwort
+                  </label>
+                  <input type="password" class="form-control"
+                         id="dropdownPassword" name="password"
+                         required>
+                </div>
 
-      <div class="mb-3">
-        <label for="dropdownPassword" class="form-label">Passwort</label>
-        <input type="password" class="form-control" id="dropdownPassword" name="password"
-               placeholder="••••••••" required>
-      </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Anmelden
+                </button>
+              </form>
 
-      <button type="submit" class="btn btn-primary w-100">Anmelden</button>
-    </form>
-
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item small" href="registration.php">Neu hier? Registrieren</a>
-  </div>
-</div>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item small" href="registration.php">
+                Neu hier? Registrieren
+              </a>
+            </div>
+          </div>
         <?php else: ?>
           <a class="btn btn-logout" href="logout.php">Logout</a>
         <?php endif; ?>
@@ -90,12 +114,19 @@ $role = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === 
     </div>
   </div>
 </nav>
+
 <main>
+
 <?php
-if (isset($_SESSION['login_error'])) {
-    echo '<div class="container mt-3"><div class="alert alert-danger alert-dismissible fade show" role="alert">'
-        . htmlspecialchars($_SESSION['login_error']) .
-        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button></div></div>';
+// Login-Fehler nur für Gäste anzeigen
+if ($role === 'guest' && isset($_SESSION['login_error'])) {
+    echo '<div class="container mt-3">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">'
+            . htmlspecialchars($_SESSION['login_error']) .
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"
+                     aria-label="Schließen"></button>
+            </div>
+          </div>';
     unset($_SESSION['login_error']);
 }
 ?>

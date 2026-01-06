@@ -1,11 +1,11 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
-// Restrict access to logged-in users
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user_id']) || (int)$_SESSION['user_id'] <= 0) {
     header('Location: index.php');
     exit;
 }
+
 
 $pageTitle = 'Meine Rezepte';
 $role = 'user';
@@ -13,42 +13,60 @@ $role = 'user';
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-$currentUser = $_SESSION['user'];
-
-// Daten laden
-require_once __DIR__ . '/../includes/data/recipes_store.php';
+require_once __DIR__ . '/../includes/db_gets.php';
 require_once __DIR__ . '/../includes/filters.php';
 require_once __DIR__ . '/../includes/components/recipe_cards.php';
-require_once __DIR__ . '/../includes/pre datatable/get_options.php';
 
-// Liste meiner Rezepte
-$allRecipes = recipesAll();
-$myRecipes  = array_values(array_filter($allRecipes, fn($r) => ($r['user'] ?? '') === $currentUser));
+$userId  = (int)$_SESSION['user_id'];
+$filters = readFilters();
 
-// Optional: Filter anwenden
-$tagFilters = normalizeTagFilters($_GET ?? []);
-$filtered   = filterRecipesByTags($myRecipes, $tagFilters);
+$recipeIds = getRecipeIdsByUserId($userId);
+
+if (empty($recipeIds)) {
+    $recipes = [];
+} else {
+    $recipes = getRecipesWithTags($recipeIds) ?? [];
+}
+
+if (!empty($filters)) {
+    $filteredIds = getRecipeIdsByTagFilters($filters);
+
+    if (empty($filteredIds)) {
+        $recipes = [];
+    } else {
+        $keep = array_flip($filteredIds);
+
+        $recipes = array_filter(
+            $recipes,
+            fn($r) => isset($keep[(int)$r['id']])
+        );
+    }
+}
 ?>
+
 <div class="container">
 
-  <section class="hero section my-3 my-md-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
-    <div>
-      <h1 class="h3 mb-2">Meine Rezepte</h1>
-      <p class="text-muted mb-0">Hier findest du alle Rezepte, die du erstellt hast.</p>
-    </div>
-    <a href="user_recipe_edit.php" class="btn btn-primary">Neues Rezept erstellen</a>
-  </section>
+    <section class="hero section my-3 my-md-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+        <div>
+            <h1 class="h3 mb-2">Meine Rezepte</h1>
+            <p class="text-muted mb-0">Alle Rezepte, die du selbst erstellt hast.</p>
+        </div>
+        <a href="recipe_edit.php" class="btn btn-primary">Neues Rezept erstellen</a>
+    </section>
 
-  <?= renderTagFilterSection($tagFilters) ?>
+    <?php displayFilterOptions(); ?>
 
-  <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
-    <div class="row g-3">
-      <?= renderRecipeCards(count($filtered), $filtered, ['view', 'edit', 'delete']); ?>
-      <?php if (empty($filtered)): ?>
-        <div class="col-12"><p class="text-muted">Keine Rezepte gefunden.</p></div>
-      <?php endif; ?>
-    </div>
-  </section>
+    <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
+        <div class="row g-3">
+            <?php if (!empty($recipes)): ?>
+                <?php displayRecipeCard($recipes, true); ?>
+            <?php else: ?>
+                <div class="col-12">
+                    <p class="text-muted">Keine Rezepte gefunden.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 
 </div>
 

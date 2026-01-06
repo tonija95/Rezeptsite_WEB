@@ -1,68 +1,37 @@
 <?php
-// filepath: c:\xampp\htdocs\rezeptsite\public\recipe_delete.php
 declare(strict_types=1);
 
-// Session sicherstellen
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
-require_once __DIR__ . '/../includes/data/recipes_actions.php';
+require_once __DIR__ . '/../includes/db_inserts.php';
 
-// Nur POST zulassen
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    // Wenn direkte GET-Anfrage: zurück zur Referer/Übersicht
-    $ref = $_SERVER['HTTP_REFERER'] ?? 'recipes.php';
-    header('Location: ' . $ref);
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'recipes.php'));
     exit;
 }
 
-// Sicherheits- / Eingabechecks
-$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$id = isset($_POST['id']) && ctype_digit((string)$_POST['id']) ? (int)$_POST['id'] : 0;
+
 $returnUrl = trim((string)($_POST['return'] ?? $_SERVER['HTTP_REFERER'] ?? 'recipes.php'));
 if ($returnUrl === '' || str_contains($returnUrl, 'recipe_delete.php')) {
     $returnUrl = 'recipes.php';
 }
 
-// Rolle / Admin frühzeitig feststellen (Admins dürfen auch ohne 'user' löschen)
-$isAdmin = (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin')
-    || (!empty($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
-
-// Wenn weder angemeldeter User noch Admin → abbrechen
-if (empty($_SESSION['user']) && !$isAdmin) {
-    $_SESSION['flash'] = ['type' => 'danger', 'msg' => 'Nicht eingeloggt.'];
+$isLoggedIn = isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && (int)$_SESSION['user_id'] > 0;
+if (!$isLoggedIn) {
     header('Location: ' . $returnUrl);
     exit;
 }
 
-$currentUser = (string)($_SESSION['user'] ?? '');
+$userId  = (int)$_SESSION['user_id'];
+$isAdmin = (isset($_SESSION['role']) && (string)$_SESSION['role'] === 'admin');
 
-// Valid id
 if ($id <= 0) {
-    $_SESSION['flash'] = ['type' => 'danger', 'msg' => 'Ungültige Rezept-ID.'];
     header('Location: ' . $returnUrl);
     exit;
 }
 
-// Delete-Funktion aufrufen (verschiedene mögliche Bezeichner)
-$deleted = false;
-if (function_exists('recipeDeleteById')) {
-    $deleted = recipeDeleteById($id, $currentUser, $isAdmin);
-} elseif (function_exists('recipesDelete')) {
-    $deleted = recipesDelete($id, $currentUser, $isAdmin);
-} elseif (function_exists('recipesDeleteById')) {
-    $deleted = recipesDeleteById($id);
-} else {
-    // keine Lösch-Funktion gefunden
-    $_SESSION['flash'] = ['type' => 'danger', 'msg' => 'Lösch-Funktion nicht vorhanden.'];
-    header('Location: ' . $returnUrl);
-    exit;
-}
-
-// Ergebnis-Feedback und Redirect
-if ($deleted) {
-    $_SESSION['flash'] = ['type' => 'success', 'msg' => "Rezept #{$id} wurde gelöscht."];
-} else {
-    $_SESSION['flash'] = ['type' => 'danger', 'msg' => 'Löschen fehlgeschlagen oder keine Berechtigung.'];
-}
+deleteRecipe($id, $userId, $isAdmin);
 
 header('Location: ' . $returnUrl);
 exit;
