@@ -27,16 +27,28 @@
 
 html, body {
   height: 100%;
+  margin: 0;                  /* Browser-default entfernen */
+  background: var(--bs-body-bg);
 }
 
 body {
-  background: var(--bs-body-bg);
-  color: var(--bs-body-color);
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.6;
   display: flex;
   flex-direction: column;
-  margin: 0;
+  min-height: 100vh;
+}
+
+/* Hauptbereich wächst, damit Footer immer unten bleibt */
+main {
+  flex: 1 0 auto;
+  min-height: 1px;           /* verhindert, dass main vollständig kollabiert */
+}
+
+/* Footer bleibt am Ende, keine zusätzlichen Bottom-Gaps */
+.footer {
+  margin-top: auto;          /* sorgt dafür, dass Footer am unteren Rand klebt */
+  margin-bottom: 0;          /* explizit Bottom-Margin entfernen */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /*    Typografie & Basislinks */
@@ -59,7 +71,7 @@ a:hover {
 
 
 main {
-  flex: 1; /* Footer immer unten */
+  flex: 1 0 auto; /* Hauptinhalt füllt verbleibende Höhe */
   margin: 0;
   background: var(--bs-body-bg);
 }
@@ -86,8 +98,8 @@ main {
 
 /* badges für Rezeptkeywords */
 .badge{
-  background:var(--color-accent);
-  color:var(--color-dark);
+  background:var(--color-accent) !important;
+  color:var(--color-dark) !important;
 }
 
 /* =========================================================
@@ -243,3 +255,4 @@ main {
   color:#fff;
   text-decoration:none;
 }
+

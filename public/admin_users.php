@@ -1,64 +1,35 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
+// Admin-Check (neu: role, fallback: admin_logged_in)
+$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
+    || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
+
+if (!$isAdmin) {
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = 'Admin: User verwalten';
 $role = 'admin';
 
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
-/* Dummy-Userdaten */
-$users = [
-  ['id'=>1, 'username'=>'anna', 'email'=>'anna@example.com', 'role'=>'user', 'joined'=>'2025-10-01'],
-  ['id'=>2, 'username'=>'max',  'email'=>'max@example.com',  'role'=>'user', 'joined'=>'2025-10-05'],
-  ['id'=>3, 'username'=>'admin','email'=>'admin@example.com','role'=>'admin','joined'=>'2025-09-28'],
-];
+require_once __DIR__ . '/../includes/db_gets.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
-/* Filter übernehmen */
-$filters = [
-  'username' => isset($_GET['username']) ? trim($_GET['username']) : '',
-  'email'    => isset($_GET['email'])    ? trim($_GET['email'])    : '',
-];
-
-/* Filtern */
-$filtered = array_filter($users, function($u) use ($filters) {
-  if ($filters['username'] && stripos($u['username'], $filters['username']) === false) return false;
-  if ($filters['email']    && stripos($u['email'],    $filters['email'])    === false) return false;
-  return true;
-});
-
-function h($str) {
-  return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
-}
+$users = getAllUsers();
+$returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_users.php';
 ?>
+
 <div class="container">
 
-  <!-- Hero -->
   <section class="hero section my-3 my-md-4">
-    <h1 class="h3 mb-2">Admin · User verwalten</h1>
-    <p class="text-muted">Hier kannst du Nutzer suchen und löschen. Bearbeitungen sind nicht möglich.</p>
+    <h1 class="h3 mb-2">User verwalten</h1>
+    <p class="text-muted">Übersicht aller User im System. Du kannst User löschen.</p>
   </section>
 
-  <!-- Filter -->
-  <section class="bg-cream section mb-3 mb-md-4 py-3 px-3">
-    <h2 class="h5 mb-3">Filter</h2>
-    <form method="get" class="row g-3 align-items-end">
-      <div class="col-12 col-md-5 col-lg-4">
-        <label class="form-label">Username</label>
-        <input type="text" class="form-control" name="username"
-               value="<?= h($filters['username']) ?>" placeholder="z. B. anna">
-      </div>
-      <div class="col-12 col-md-5 col-lg-4">
-        <label class="form-label">E-Mail</label>
-        <input type="text" class="form-control" name="email"
-               value="<?= h($filters['email']) ?>" placeholder="name@example.com">
-      </div>
-      <div class="col-12 col-md-2 col-lg-2 d-flex gap-2">
-        <button class="btn btn-primary w-100">Filtern</button>
-        <a href="admin_users.php" class="btn btn-outline-secondary w-100">Zurücksetzen</a>
-      </div>
-    </form>
-  </section>
-
-  <!-- Tabelle -->
   <section class="section mb-3 mb-md-4">
     <div class="table-responsive">
       <table class="table table-striped align-middle">
@@ -68,32 +39,45 @@ function h($str) {
             <th>Username</th>
             <th>E-Mail</th>
             <th>Rolle</th>
-            <th>Beigetreten</th>
             <th class="text-end">Aktionen</th>
           </tr>
         </thead>
+
         <tbody>
-          <?php if (empty($filtered)): ?>
-            <tr><td colspan="6" class="text-center text-muted py-4">Keine Nutzer gefunden.</td></tr>
+          <?php if (empty($users)): ?>
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">Keine Nutzer gefunden.</td>
+            </tr>
           <?php else: ?>
-            <?php foreach ($filtered as $u): ?>
+            <?php foreach ($users as $u): ?>
+              <?php
+                $uid  = (int)($u['id'] ?? 0);
+                $name = (string)($u['name'] ?? '');
+                $mail = (string)($u['email'] ?? '');
+                $r    = (string)($u['role'] ?? 'user');
+              ?>
               <tr>
-                <td><?= (int)$u['id'] ?></td>
-                <td><?= h($u['username']) ?></td>
-                <td><?= h($u['email']) ?></td>
-                <td><?= h($u['role']) ?></td>
-                <td class="text-muted small"><?= h($u['joined']) ?></td>
+                <td><?= esc((string)$uid) ?></td>
+                <td><?= esc($name) ?></td>
+                <td><?= esc($mail) ?></td>
+                <td><?= esc($r) ?></td>
                 <td class="text-end">
-                  <a href="admin_user_delete.php?id=<?= (int)$u['id'] ?>"
-                     class="btn btn-sm btn-danger"
-                     onclick="return confirm('Diesen Nutzer wirklich löschen?');">
-                    Löschen
-                  </a>
+                  <form
+                    method="post"
+                    action="admin_user_delete.php"
+                    class="d-inline"
+                    onsubmit="return confirm('Diesen Nutzer wirklich löschen?');"
+                  >
+                    <input type="hidden" name="id" value="<?= esc((string)$uid) ?>">
+                    <input type="hidden" name="return" value="<?= esc($returnUrl) ?>">
+                    <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+                  </form>
                 </td>
               </tr>
             <?php endforeach; ?>
           <?php endif; ?>
         </tbody>
+
       </table>
     </div>
   </section>
@@ -101,4 +85,3 @@ function h($str) {
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
-
