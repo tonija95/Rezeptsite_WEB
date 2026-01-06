@@ -44,14 +44,10 @@ if ($existing) {
     exit;
 }
 
-/*
- * HINWEIS:
- * Passwort wird aktuell im Klartext gespeichert.
- * Hashing kann später hier ergänzt werden.
- */
 
-/* User anlegen */
-$newUserId = createUser($username, $email, $password);
+/* User anlegen (Passwort hashen) */
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+$newUserId = createUser($username, $email, $hashedPassword);
 
 if ($newUserId <= 0) {
     $_SESSION['login_error'] = 'Registrierung fehlgeschlagen.';

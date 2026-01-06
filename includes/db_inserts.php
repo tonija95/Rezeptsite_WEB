@@ -22,6 +22,16 @@ function createUser(string $name, string $email, string $password): int
     return (int)$db->insert_id;
 }
 
+function updateUserPassword(int $userId, string $hashedPassword): bool
+{
+    $db = getDbConnection();
+
+    $stmt = $db->prepare("UPDATE user SET password = ? WHERE id = ? LIMIT 1");
+    $stmt->bind_param("si", $hashedPassword, $userId);
+
+    return $stmt->execute();
+}
+
 function deleteUserById(int $userIdToDelete, int $currentAdminId): bool
 {
     $db = getDbConnection();

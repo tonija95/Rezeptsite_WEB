@@ -14,6 +14,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 // NEU: DB-Funktionen laden
 require_once __DIR__ . '/../includes/db_gets.php';
+require_once __DIR__ . '/../includes/db_inserts.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -31,19 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // NEU: User aus DB laden
     $user = getUserByUsername($username);
 
-    if ($user && (string)$user['password'] === $password) {
-
-        // ALT: Admin-Login speziell
-        // if ($username === 'admin') {
-        //     $_SESSION['admin_logged_in'] = true;
-        //     $_SESSION['role'] = 'admin';
-        //     header('Location: admin.php');
-        // } else {
-        //     $_SESSION['user'] = $username;
-        //     header('Location: user_dashboard.php');
-        // }
-
-        // NEU: Einheitliche Session-Werte
+    // 1) Falls Passwort bereits gehasht in DB dann mit password_verify prüfen
+    if ($user && is_string($user['password']) && password_verify($password, $user['password'])) {
         session_regenerate_id(true);
 
         $_SESSION['user_id'] = (int)$user['id'];
@@ -57,12 +47,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         exit;
-    } else {
-        $error = 'Ungültige Anmeldedaten!';
-        $_SESSION['login_error'] = $error;
-        header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+    }
+
+    // 2) PW das noch im Klartext in DB: Direktvergleich + Hashen
+    if ($user && (string)$user['password'] === $password) {
+        $newHash = password_hash($password, PASSWORD_DEFAULT);
+        if ($newHash) {
+            updateUserPassword((int)$user['id'], $newHash);
+        }
+
+        session_regenerate_id(true);
+
+        $_SESSION['user_id'] = (int)$user['id'];
+        $_SESSION['user'] = (string)$user['name'];
+        $_SESSION['role']    = (string)($user['role'] ?? 'user');
+
+        if ($_SESSION['role'] === 'admin') {
+            header('Location: admin.php');
+        } else {
+            header('Location: user_my_recipes.php');
+        }
+
         exit;
     }
+
+    // Fehlersituation
+    $error = 'Ungültige Anmeldedaten!';
+    $_SESSION['login_error'] = $error;
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+    exit;
 } else {
     header('Location: index.php');
     exit;
