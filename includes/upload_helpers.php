@@ -10,6 +10,21 @@ function ensureDir(string $dirAbs): bool
     return mkdir($dirAbs, 0775, true) && is_writable($dirAbs);
 }
 
+function deleteOldRecipeImages(int $recipeId, string $targetDirAbs): void
+{
+    if ($recipeId <= 0 || !is_dir($targetDirAbs)) {
+        return;
+    }
+
+    $extensions = ['jpg', 'png', 'webp', 'gif'];
+    foreach ($extensions as $ext) {
+        $oldFile = $targetDirAbs . DIRECTORY_SEPARATOR . 'recipe_' . $recipeId . '.' . $ext;
+        if (is_file($oldFile)) {
+            @unlink($oldFile);
+        }
+    }
+}
+
 function detectImageExtension(string $tmpPath): ?string
 {
     if (!is_file($tmpPath)) {
@@ -46,7 +61,8 @@ function uploadRecipeImage(
         return ['path' => null, 'error' => 'Ungültige Rezept-ID für Upload.'];
     }
 
-    if ($publicDirAbs === '' || !is_dir($publicDirAbs)) {
+    $absPath = realpath($publicDirAbs);
+    if ($absPath === false || !is_dir($absPath)) {
         return ['path' => null, 'error' => 'Public-Verzeichnis nicht gefunden.'];
     }
 
@@ -72,12 +88,14 @@ function uploadRecipeImage(
     }
 
     $subDir = '/' . ltrim($subDir, '/');
-    $targetDirAbs = rtrim($publicDirAbs, DIRECTORY_SEPARATOR)
+    $targetDirAbs = rtrim($absPath, DIRECTORY_SEPARATOR)
         . str_replace('/', DIRECTORY_SEPARATOR, $subDir);
 
     if (!ensureDir($targetDirAbs)) {
         return ['path' => null, 'error' => 'Upload-Ordner ist nicht beschreibbar.'];
     }
+
+    deleteOldRecipeImages($recipeId, $targetDirAbs);
 
     $filename  = 'recipe_' . $recipeId . '.' . $ext;
     $targetAbs = $targetDirAbs . DIRECTORY_SEPARATOR . $filename;
@@ -86,8 +104,10 @@ function uploadRecipeImage(
         return ['path' => null, 'error' => 'Bild konnte nicht gespeichert werden.'];
     }
 
+    $returnPath = $subDir . '/' . $filename . '?v=' . time();
+
     return [
-        'path'  => $subDir . '/' . $filename,
+        'path'  => $returnPath,
         'error' => null
     ];
 }
