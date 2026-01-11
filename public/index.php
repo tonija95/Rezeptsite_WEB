@@ -12,10 +12,9 @@ $indexData = getIndexRecipes();
 $newest = $indexData['newest'];
 $random = $indexData['random'];
 ?>
-
+<main>
 <div class="container">
 
-  <!-- Hero -->
 <section class="hero section my-3 my-md-4 text-center">
   <h1 class="display-6 mb-3">Willkommen auf unserer Rezeptseite!</h1>
   <p class="lead text-muted mb-4">
@@ -42,7 +41,6 @@ $random = $indexData['random'];
 </section>
 
 
-  <!-- Neueste Rezepte -->
   <section class="section bg-cream mb-3 mb-md-4 py-4 px-3">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
       <h2 class="h5 mb-0">🆕 Neu hinzugefügt</h2>
@@ -58,7 +56,6 @@ $random = $indexData['random'];
     </div>
   </section>
 
-  <!-- Zufällige Inspiration -->
   <section class="section bg-cream mb-3 mb-md-4 py-4 px-3">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
       <h2 class="h5 mb-0">✨ Zufällige Inspiration</h2>
@@ -75,5 +72,5 @@ $random = $indexData['random'];
   </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -1,16 +1,13 @@
 <?php
 $pageTitle = 'Registrierung / Login';
 
-
-
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 
 ?>
-
+<main>
 <div class="container">
 
-  <!-- Hero -->
   <section class="hero section my-3 my-md-4">
     <h1 class="h3 mb-2">Konto erstellen oder anmelden</h1>
     <p class="text-muted mb-0">
@@ -20,7 +17,6 @@ include __DIR__ . '/../includes/nav.php';
 
   <div class="row g-3">
 
-    <!-- Registrierung -->
     <div class="col-12 col-lg-6">
       <section class="bg-cream section mb-3 mb-md-4">
         <h2 class="fs-5 mb-3">Kostenlos registrieren</h2>
@@ -79,7 +75,6 @@ include __DIR__ . '/../includes/nav.php';
       </section>
     </div>
 
-    <!-- Login -->
     <div class="col-12 col-lg-6">
       <section class="bg-cream section mb-3 mb-md-4">
         <h2 class="fs-5 mb-3">Bereits registriert?</h2>
@@ -123,5 +118,5 @@ include __DIR__ . '/../includes/nav.php';
   </div>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

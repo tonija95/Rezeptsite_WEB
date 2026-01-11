@@ -12,6 +12,7 @@ include __DIR__ . '/../includes/nav.php';
 require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
 ?>
 
+<main>
 <div class="container">
 
     <section class="hero section my-3 my-md-4">
@@ -35,7 +36,7 @@ require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
 
         <form method="post" class="row g-3" enctype="multipart/form-data">
 
-            <!-- LINKS -->
+
             <div class="col-12 col-lg-8">
 
                 <label class="form-label">Rezeptname *</label>
@@ -139,7 +140,7 @@ require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
 
             </div>
 
-            <!-- RECHTS -->
+
             <div class="col-12 col-lg-4">
                 <div class="row g-3">
 
@@ -165,7 +166,7 @@ require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
                         >
                     </div>
 
-                    <!-- Bild Upload statt Bildpfad -->
+
                     <div class="col-12">
                         <label for="recipeImage" class="form-label">Bild hochladen</label>
 
@@ -185,6 +186,11 @@ require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
                                 style="max-height: 180px; object-fit: cover;"
                             >
                         </div>
+
+                        <input type="hidden" 
+                        name="current_picture_path" 
+                        value="<?= esc($form['picture_path'] ?? '/img/placeholder_food.jpg') ?>"
+                        >
 
                         <input
                             type="file"
@@ -251,5 +257,5 @@ require_once __DIR__ . '/../includes/user_recipe_edit_logic.php';
     </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

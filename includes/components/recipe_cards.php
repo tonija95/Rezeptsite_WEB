@@ -1,7 +1,5 @@
 <?php
 
-
-
 function displayRecipeCard(array $recipes, bool $manage = false): void {
 
 // Erwartete Struktur von $recipes:
@@ -118,9 +116,7 @@ function displayCompactRecipeCards(array $recipes): void
                     <?php endif; ?>
 
                     <div class="mt-auto">
-                        <a href="recipe.php?id=<?= esc($recipe['id']) ?>" class="btn btn-outline-secondary btn-sm">
-                            Ansehen
-                        </a>
+                        <a href="recipe.php?id=<?= (int)$recipe['id'] ?>" class="btn btn-outline-secondary btn-sm">Ansehen</a>
                     </div>
 
                 </div>

@@ -1,11 +1,9 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Admin-Check (neu: role, fallback: admin_logged_in)
-$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
-    || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
-
-if (!$isAdmin) {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: index.php');
     exit;
 }
@@ -22,7 +20,6 @@ require_once __DIR__ . '/../includes/helpers.php';
 
 $filters = readFilters();
 
-// Wenn Filter gesetzt → hole passende IDs und dann Rezepte
 if (!empty($filters)) {
     $filteredIds = getRecipeIdsByTagFilters($filters);
     $recipes = !empty($filteredIds) ? (getRecipesWithTags($filteredIds) ?? []) : [];
@@ -30,10 +27,9 @@ if (!empty($filters)) {
     $recipes = getAllRecipesWithTags();
 }
 
-// Return-URL für delete
 $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_recipes.php';
 ?>
-
+<main>
 <div class="container">
 
   <section class="hero section my-3 my-md-4">
@@ -50,7 +46,6 @@ $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_recipes.php';
       <p class="text-muted">Keine Rezepte gefunden.</p>
     <?php else: ?>
 
-      <!-- Mobile: Cards -->
       <div class="d-md-none">
         <?php foreach ($recipes as $r): ?>
           <?php
@@ -99,7 +94,6 @@ $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_recipes.php';
         <?php endforeach; ?>
       </div>
 
-      <!-- Desktop: Tabelle -->
       <div class="d-none d-md-block">
         <div class="table-responsive">
           <table class="table table-hover align-middle">
@@ -168,5 +162,6 @@ $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_recipes.php';
   </section>
 
 </div>
+</main>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -2,12 +2,6 @@
 
 require_once __DIR__ . '/db_connect.php';
 
-/*
-|--------------------------------------------------------------------------
-| USERS
-|--------------------------------------------------------------------------
-*/
-
 function createUser(string $name, string $email, string $password): int
 {
     $db = getDbConnection();
@@ -67,12 +61,6 @@ function deleteUserById(int $userIdToDelete, int $currentAdminId): bool
     return $stmtDel->execute();
 }
 
-/*
-|--------------------------------------------------------------------------
-| RECIPES
-|--------------------------------------------------------------------------
-*/
-
 function createRecipe(array $data, int $userId): int
 {
     $db = getDbConnection();
@@ -97,7 +85,6 @@ function createRecipe(array $data, int $userId): int
 
     $stmt = $db->prepare($sql);
 
-    // title, description, timeMin, servings, steps, userId, picturePath
     $stmt->bind_param(
         "ssiisis",
         $title,
@@ -119,10 +106,10 @@ function updateRecipe(int $recipeId, array $data, int $currentUserId, bool $isAd
     $db = getDbConnection();
 
     $title       = (string)($data['title'] ?? '');
-    $description = ($data['description'] ?? null);
+    $description = $data['description'] ?? null;
     $timeMin     = $data['time_min'] ?? null;
     $servings    = $data['servings'] ?? null;
-    $steps       = ($data['steps'] ?? null);
+    $steps       = $data['steps'] ?? null;
     $picturePath = (string)($data['picture_path'] ?? '/img/placeholder_food.jpg');
 
     $description = ($description === '') ? null : $description;
@@ -144,17 +131,34 @@ function updateRecipe(int $recipeId, array $data, int $currentUserId, bool $isAd
     $stmt = $db->prepare($sql);
 
     if ($isAdmin) {
-        // title, description, timeMin, servings, steps, picturePath, recipeId
-        $stmt->bind_param("ssiissi", $title, $description, $timeMin, $servings, $steps, $picturePath, $recipeId);
+        $stmt->bind_param(
+            "ssiissi",
+            $title,
+            $description,
+            $timeMin,
+            $servings,
+            $steps,
+            $picturePath,
+            $recipeId
+        );
     } else {
-        // title, description, timeMin, servings, steps, picturePath, recipeId, currentUserId
-        $stmt->bind_param("ssiissii", $title, $description, $timeMin, $servings, $steps, $picturePath, $recipeId, $currentUserId);
+        $stmt->bind_param(
+            "ssiissii",
+            $title,
+            $description,
+            $timeMin,
+            $servings,
+            $steps,
+            $picturePath,
+            $recipeId,
+            $currentUserId
+        );
     }
 
-    $stmt->execute();
-
-    return $stmt->affected_rows > 0;
+    $ok = $stmt->execute();
+    return $ok;
 }
+
 
 function deleteRecipe(int $recipeId, int $currentUserId, bool $isAdmin): bool
 {
@@ -210,11 +214,27 @@ function deleteRecipe(int $recipeId, int $currentUserId, bool $isAdmin): bool
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| RECIPE TAGS
-|--------------------------------------------------------------------------
-*/
+function addFavorite(int $userId, int $recipeId): bool
+{
+    $db = getDbConnection();
+
+    $sql = "INSERT IGNORE INTO user_favorites (user_id, recipe_id) VALUES (?, ?)";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("ii", $userId, $recipeId);
+
+    return $stmt->execute();
+}
+
+function removeFavorite(int $userId, int $recipeId): bool
+{
+    $db = getDbConnection();
+
+    $sql = "DELETE FROM user_favorites WHERE user_id = ? AND recipe_id = ? LIMIT 1";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("ii", $userId, $recipeId);
+
+    return $stmt->execute();
+}
 
 function replaceRecipeTags(int $recipeId, array $tagIds): void
 {
@@ -236,12 +256,6 @@ function replaceRecipeTags(int $recipeId, array $tagIds): void
         $stmtIns->execute();
     }
 }
-
-/*
-|--------------------------------------------------------------------------
-| RECIPE INGREDIENTS
-|--------------------------------------------------------------------------
-*/
 
 function replaceRecipeIngredients(int $recipeId, array $ingredients): void
 {
@@ -277,13 +291,6 @@ function replaceRecipeIngredients(int $recipeId, array $ingredients): void
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| SHOPPING LIST
-|--------------------------------------------------------------------------
-
-*/
-
 function addIngredientsToShoppingList(int $userId, array $ingredients): void
 {
     if ($userId <= 0 || empty($ingredients)) {
@@ -306,7 +313,6 @@ function addIngredientsToShoppingList(int $userId, array $ingredients): void
         $unit = trim((string)($ing['unit'] ?? ''));
         $qtyRaw = (string)($ing['quantity'] ?? '');
 
-        // wenn quantity nicht numeric ist (zB "1/2"), dann skippen (oder später schöner lösen)
         $qty = is_numeric($qtyRaw) ? (int)$qtyRaw : 0;
 
         if ($name === '' || $qty <= 0) {
@@ -317,7 +323,6 @@ function addIngredientsToShoppingList(int $userId, array $ingredients): void
         $stmt->execute();
     }
 }
-
 
 function deleteShoppingListItem(int $itemId, int $userId): bool
 {

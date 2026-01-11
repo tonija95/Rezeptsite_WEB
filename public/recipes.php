@@ -10,7 +10,7 @@ include_once __DIR__ . '/../includes/filters.php';
 include_once __DIR__ . '/../includes/components/recipe_cards.php';
 ?>
 
-
+<main>
 <div class="container ">
   <section class="hero my-3 my-md-4 py-3 px-3">
 <div class="mb-3">
@@ -43,5 +43,5 @@ displayRecipeCard($recipes);
     </div>
   </section>
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

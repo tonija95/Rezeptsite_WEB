@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// User ist nur eingeloggt, wenn user_id vorhanden ist
+
 $isLoggedIn = isset($_SESSION['user_id'])
     && is_numeric($_SESSION['user_id'])
     && (int)$_SESSION['user_id'] > 0;
@@ -26,13 +26,13 @@ if ($isLoggedIn) {
     </button>
 
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-      <!-- Mitte: Hauptlinks -->
+
       <ul class="navbar-nav mx-auto flex-column flex-md-row gap-3">
         <li class="nav-item">
           <a class="nav-link px-0 px-md-2" href="recipes.php">Rezepte</a>
         </li>
 
-        <!-- User-spezifische Links -->
+
         <?php if ($role === 'user'): ?>
           <li class="nav-item">
             <a class="nav-link text-nowrap px-0 px-md-2" href="user_my_recipes.php">
@@ -51,7 +51,7 @@ if ($isLoggedIn) {
           </li>
         <?php endif; ?>
 
-        <!-- Admin -->
+
         <?php if ($role === 'admin'): ?>
           <li class="nav-item">
             <a class="nav-link px-0 px-md-2" href="admin.php">Admin Panel</a>
@@ -65,7 +65,7 @@ if ($isLoggedIn) {
         <?php endif; ?>
       </ul>
 
-      <!-- Rechts: Login / Logout -->
+
       <div class="d-flex ms-md-3">
         <?php if ($role === 'guest'): ?>
           <div class="dropdown dropdown-login">
@@ -115,10 +115,10 @@ if ($isLoggedIn) {
   </div>
 </nav>
 
-<main>
+
 
 <?php
-// Login-Fehler nur für Gäste anzeigen
+
 if ($role === 'guest' && isset($_SESSION['login_error'])) {
     echo '<div class="container mt-3">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">'

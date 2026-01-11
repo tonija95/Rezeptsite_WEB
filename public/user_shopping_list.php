@@ -19,17 +19,13 @@ require_once __DIR__ . '/../includes/db_inserts.php';
 
 $userId = (int)$_SESSION['user_id'];
 
-/* =========================
-   POST Aktionen
-   ========================= */
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Einzelnen Eintrag löschen
     if (isset($_POST['delete_id']) && ctype_digit($_POST['delete_id'])) {
         deleteShoppingListItem((int)$_POST['delete_id'], $userId);
     }
 
-    // Ganze Liste löschen
     if (isset($_POST['clear_all'])) {
         clearShoppingListByUserId($userId);
     }
@@ -41,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $shoppingItems = getShoppingListByUserId($userId);
 ?>
 
+<main>
 <div class="container">
 
     <section class="hero section my-3 my-md-4">
@@ -52,7 +49,6 @@ $shoppingItems = getShoppingListByUserId($userId);
 
         <?php if (!empty($shoppingItems)): ?>
 
-            <!-- Aktionen -->
             <div class="d-flex justify-content-end mb-2">
                 <form method="post" onsubmit="return confirm('Einkaufsliste wirklich komplett leeren?');">
                     <button
@@ -114,5 +110,5 @@ $shoppingItems = getShoppingListByUserId($userId);
     </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

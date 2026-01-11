@@ -1,5 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_SESSION['user_id']) || (int)$_SESSION['user_id'] <= 0) {
     header('Location: index.php');
@@ -43,7 +45,7 @@ if (!empty($filters)) {
     }
 }
 ?>
-
+<main>
 <div class="container">
 
     <section class="hero section my-3 my-md-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
@@ -51,7 +53,7 @@ if (!empty($filters)) {
             <h1 class="h3 mb-2">Meine Rezepte</h1>
             <p class="text-muted mb-0">Alle Rezepte, die du selbst erstellt hast.</p>
         </div>
-        <a href="recipe_edit.php" class="btn btn-primary">Neues Rezept erstellen</a>
+        <a href="user_recipe_edit.php" class="btn btn-primary">Neues Rezept erstellen</a>
     </section>
 
     <?php displayFilterOptions(); ?>
@@ -69,5 +71,5 @@ if (!empty($filters)) {
     </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

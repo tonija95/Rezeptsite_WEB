@@ -13,6 +13,8 @@ include __DIR__ . '/../includes/nav.php';
 
 require_once __DIR__ . '/../includes/db_gets.php';
 require_once __DIR__ . '/../includes/components/recipe_cards.php';
+require_once __DIR__ . '/../includes/favorite_helpers.php';
+
 
 $id = isset($_GET['id']) && ctype_digit($_GET['id'])
     ? (int)$_GET['id']
@@ -31,6 +33,21 @@ if ($id <= 0) {
     include __DIR__ . '/../includes/footer.php';
     exit;
 }
+
+
+if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['favorite_recipe_id'])) {
+    $favRecipeId = (int)$_POST['favorite_recipe_id'];
+
+    
+    if ($favRecipeId === $id) {
+        toggleFavorite((int)$_SESSION['user_id'], $favRecipeId);
+    }
+
+    
+    header('Location: ' . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
 
 $rows   = getRecipesWithTags([$id]);
 $recipe = $rows[$id] ?? null;
@@ -51,7 +68,7 @@ if (!$recipe) {
 
 $ingredients = getIngredientsByRecipeId($id);
 
-/* Tags flach machen */
+
 $tagsFlat = [];
 if (!empty($recipe['tags'])) {
     foreach ($recipe['tags'] as $t) {
@@ -61,21 +78,21 @@ if (!empty($recipe['tags'])) {
     }
 }
 
-/* Ähnliche Rezepte */
+
 $similarIds = getSimilarRecipeIdsByRecipeId($id, 3);
 $similar    = !empty($similarIds)
     ? (getRecipesWithTags($similarIds) ?? [])
     : [];
 ?>
 
+<main>
 <div class="container">
 
     <div class="row justify-content-center g-4">
 
-        <!-- Hauptinhalt -->
+
         <article class="col-12 col-lg-8">
 
-            <!-- Header -->
             <section class="section hero my-3 my-md-4">
                 <h1 class="fs-3 mb-2"><?= esc($recipe['title'] ?? 'Unbenannt') ?></h1>
 
@@ -106,7 +123,6 @@ $similar    = !empty($similarIds)
                 <?php if ($isLoggedIn): ?>
                     <div class="d-flex gap-2 mt-3">
 
-                        <!-- Einkaufsliste -->
                         <form method="post" action="shopping_add.php" class="d-inline">
                             <input type="hidden" name="recipe_id" value="<?= (int)$id ?>">
                             <input type="hidden" name="return" value="<?= esc($_SERVER['REQUEST_URI']) ?>">
@@ -115,11 +131,11 @@ $similar    = !empty($similarIds)
                             </button>
                         </form>
 
-                        <!-- Favorit (Platzhalter) -->
-                        <form method="post" action="favorite_toggle.php" class="d-inline">
-                            <input type="hidden" name="recipe_id" value="<?= (int)$id ?>">
+                         <?php $isFav = isRecipeFavorited((int)$_SESSION['user_id'], (int)$id); ?>
+                        <form method="post" class="d-inline">
+                            <input type="hidden" name="favorite_recipe_id" value="<?= (int)$id ?>">
                             <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                ☆ Favorit
+                            <?= $isFav ? '★ Entfernen' : '☆ Favorit' ?>
                             </button>
                         </form>
 
@@ -128,7 +144,6 @@ $similar    = !empty($similarIds)
 
             </section>
 
-            <!-- Zutaten -->
             <section class="section bg-cream mb-3 mb-md-4">
                 <div class="row g-3 align-items-start">
 
@@ -166,7 +181,6 @@ $similar    = !empty($similarIds)
                 </div>
             </section>
 
-            <!-- Zubereitung -->
             <section class="section bg-cream mb-3 mb-md-4">
                 <h2 class="fs-5 mb-3">Zubereitung</h2>
 
@@ -179,7 +193,7 @@ $similar    = !empty($similarIds)
 
         </article>
 
-        <!-- Sidebar -->
+        
         <aside class="col-12 col-lg-4">
             <section class="section mt-4">
                 <h2 class="fs-6 mb-4">Ähnliche Rezepte</h2>
@@ -195,5 +209,5 @@ $similar    = !empty($similarIds)
     </div>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

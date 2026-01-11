@@ -1,11 +1,9 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Admin-Check (neu: role, fallback: admin_logged_in)
-$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
-    || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
-
-if (!$isAdmin) {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: index.php');
     exit;
 }
@@ -23,6 +21,7 @@ $users = getAllUsers();
 $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_users.php';
 ?>
 
+<main>
 <div class="container">
 
   <section class="hero section my-3 my-md-4">
@@ -83,5 +82,5 @@ $returnUrl = $_SERVER['REQUEST_URI'] ?? 'admin_users.php';
   </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

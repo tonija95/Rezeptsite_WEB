@@ -1,13 +1,17 @@
 <?php
-function getDbConnection() {
+
+function getDbConnection(): mysqli
+{
     require __DIR__ . '/db_access.php';
 
-    $db_obj = new mysqli($host, $user, $password, $database);
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    if ($db_obj->connect_error) {
-        echo "Connection Error: " . $db_obj->connect_error;
+    try {
+        $db = new mysqli($host, $user, $password, $database);
+        $db->set_charset('utf8mb4');
+        return $db;
+    } catch (Throwable $e) {
+        http_response_code(500);
+        exit('Database connection failed');
     }
-    
-    return $db_obj;
 }
-?>

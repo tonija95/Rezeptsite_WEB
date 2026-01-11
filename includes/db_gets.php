@@ -2,12 +2,6 @@
 
 require_once __DIR__ . '/db_connect.php';
 
-/*
-|--------------------------------------------------------------------------
-| USERS
-|--------------------------------------------------------------------------
-*/
-
 function getUserByUsername(string $username): ?array
 {
     $db = getDbConnection();
@@ -38,12 +32,6 @@ function getAllUsers(): array
     return $users;
 }
 
-/*
-|--------------------------------------------------------------------------
-| TAGS
-|--------------------------------------------------------------------------
-*/
-
 function getAllTags(): array
 {
     $db = getDbConnection();
@@ -58,12 +46,6 @@ function getAllTags(): array
 
     return $tags;
 }
-
-/*
-|--------------------------------------------------------------------------
-| RECIPES (WITH TAGS)
-|--------------------------------------------------------------------------
-*/
 
 function getAllRecipesWithTags(): array
 {
@@ -207,11 +189,37 @@ function getRecipesWithTags(array $recipeIds): ?array
     return $recipes;
 }
 
-/*
-|--------------------------------------------------------------------------
-| FILTERS
-|--------------------------------------------------------------------------
-*/
+function getFavoriteRecipeIdsByUserId(int $userId): array
+{
+    $db = getDbConnection();
+
+    $sql = "SELECT recipe_id FROM user_favorites WHERE user_id = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+
+    $res = $stmt->get_result();
+
+    $ids = [];
+    while ($row = $res->fetch_assoc()) {
+        $ids[] = (int)$row['recipe_id'];
+    }
+
+    return $ids;
+}
+
+function isRecipeFavorited(int $userId, int $recipeId): bool
+{
+    $db = getDbConnection();
+
+    $sql = "SELECT 1 FROM user_favorites WHERE user_id = ? AND recipe_id = ? LIMIT 1";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("ii", $userId, $recipeId);
+    $stmt->execute();
+
+    $res = $stmt->get_result();
+    return $res && $res->num_rows > 0;
+}
 
 function getRecipeIdsByTagFilters(array $filters): array
 {
@@ -345,12 +353,6 @@ function getSimilarRecipeIdsByRecipeId(int $recipeId, int $limit = 3): array
     return $ids;
 }
 
-/*
-|--------------------------------------------------------------------------
-| INGREDIENTS
-|--------------------------------------------------------------------------
-*/
-
 function getIngredientsByRecipeId(int $recipeId): array
 {
     $db = getDbConnection();
@@ -369,12 +371,6 @@ function getIngredientsByRecipeId(int $recipeId): array
 
     return $ings;
 }
-
-/*
-|--------------------------------------------------------------------------
-| SHOPPING LIST
-|--------------------------------------------------------------------------
-*/
 
 function getShoppingListByUserId(int $userId): array
 {
@@ -400,3 +396,4 @@ function getShoppingListByUserId(int $userId): array
 
     return $items;
 }
+

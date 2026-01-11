@@ -1,10 +1,9 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
-    || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
-
-if (!$isAdmin) {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: index.php');
     exit;
 }
@@ -31,3 +30,5 @@ if ($userIdToDelete <= 0 || $currentAdminId <= 0) {
 
 $ok = deleteUserById($userIdToDelete, $currentAdminId);
 
+header('Location: ' . $returnUrl);
+exit;

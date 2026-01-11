@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Nur Admins erlauben
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: index.php');
     exit;
@@ -15,7 +14,7 @@ $role = 'admin';
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/nav.php';
 ?>
-
+<main>
 <div class="container">
 
   <section class="hero section my-3 my-md-4">
@@ -28,7 +27,6 @@ include __DIR__ . '/../includes/nav.php';
   <section class="section bg-cream mb-3 mb-md-4 py-4 px-3">
     <div class="row g-3">
 
-      <!-- User verwalten -->
       <div class="col-12 col-md-6">
         <div class="card h-100">
           <div class="card-body d-flex flex-column">
@@ -43,7 +41,6 @@ include __DIR__ . '/../includes/nav.php';
         </div>
       </div>
 
-      <!-- Rezepte verwalten -->
       <div class="col-12 col-md-6">
         <div class="card h-100">
           <div class="card-body d-flex flex-column">
@@ -62,5 +59,5 @@ include __DIR__ . '/../includes/nav.php';
   </section>
 
 </div>
-
+</main>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
