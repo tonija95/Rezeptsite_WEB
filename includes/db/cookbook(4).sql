@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 11. Jan 2026 um 15:54
+-- Erstellungszeit: 11. Jan 2026 um 20:52
 -- Server-Version: 10.4.32-MariaDB
 -- PHP-Version: 8.2.12
 
@@ -473,20 +473,20 @@ INSERT INTO `user_favorites` (`user_id`, `recipe_id`, `created_at`) VALUES
 --
 ALTER TABLE `recipes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `recipe_user` (`user_id`);
+  ADD KEY `fk_recipes_user` (`user_id`);
 
 --
 -- Indizes für die Tabelle `recipe_ingredients`
 --
 ALTER TABLE `recipe_ingredients`
-  ADD KEY `recipe_ingredients_recipe` (`recipe_id`);
+  ADD KEY `fk_ingredients_recipe` (`recipe_id`);
 
 --
 -- Indizes für die Tabelle `recipe_tags`
 --
 ALTER TABLE `recipe_tags`
-  ADD KEY `recipe_id` (`recipe_id`),
-  ADD KEY `tag_id` (`tag_id`);
+  ADD KEY `fk_recipe_tags_recipe` (`recipe_id`),
+  ADD KEY `fk_recipe_tags_tag` (`tag_id`);
 
 --
 -- Indizes für die Tabelle `shopping_list`
@@ -512,7 +512,7 @@ ALTER TABLE `user`
 --
 ALTER TABLE `user_favorites`
   ADD PRIMARY KEY (`user_id`,`recipe_id`),
-  ADD KEY `fk_fav_recipe` (`recipe_id`);
+  ADD KEY `fk_favorites_recipe` (`recipe_id`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
@@ -522,7 +522,7 @@ ALTER TABLE `user_favorites`
 -- AUTO_INCREMENT für Tabelle `recipes`
 --
 ALTER TABLE `recipes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT für Tabelle `shopping_list`
@@ -540,7 +540,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints der exportierten Tabellen
@@ -550,18 +550,21 @@ ALTER TABLE `user`
 -- Constraints der Tabelle `recipes`
 --
 ALTER TABLE `recipes`
-  ADD CONSTRAINT `recipe_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_recipes_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints der Tabelle `recipe_ingredients`
 --
 ALTER TABLE `recipe_ingredients`
+  ADD CONSTRAINT `fk_ingredients_recipe` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `recipe_ingredients_recipe` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `recipe_tags`
 --
 ALTER TABLE `recipe_tags`
+  ADD CONSTRAINT `fk_recipe_tags_recipe` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_recipe_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `recipe_id` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -576,7 +579,9 @@ ALTER TABLE `shopping_list`
 --
 ALTER TABLE `user_favorites`
   ADD CONSTRAINT `fk_fav_recipe` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_fav_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_fav_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_favorites_recipe` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

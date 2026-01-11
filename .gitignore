@@ -15,7 +15,17 @@ config/config.php
 # except README.md
 !/uploads/README.md
 
+# Documentation folder (local only, not in git)
+/DOKUMENTATION_CODE_EXPLAINED/
+
+# Local documentation files
+TRACEABILITY_MATRIX.txt
+TRACEABILITY_MATRIX_WORD.txt
+
+# .gitignore itself (meta - don't commit)
+.gitignore
 
 # IDE & editor settings
 /.vscode/
 .idea/
+.gitignore
